@@ -79,6 +79,18 @@ Cloudflare muestra una URL `https://algo.trycloudflare.com` que funciona
 mientras la consola siga abierta y tu PC esté encendida. Esa URL cambia cada
 vez que se reinicia el túnel, así que hay que volver a compartirla.
 
+### Evitar que el equipo se suspenda
+
+Para que el enlace no se caiga por inactividad, abre otra consola y ejecuta:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\mantener_despierto.ps1
+```
+
+Mientras esa ventana siga abierta, Windows no suspende el equipo. En laptops,
+además hay que dejarla enchufada; si se agota la batería o se cierra la tapa,
+el sistema puede entrar en suspensión y el enlace deja de responder.
+
 ### ngrok (requiere cuenta gratuita)
 
 ```powershell
