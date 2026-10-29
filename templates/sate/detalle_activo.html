@@ -1,0 +1,146 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+    <div class="page-header">
+        <div>
+            <h2>Ficha Técnica del Activo: {{ activo.identificador or activo.id }}</h2>
+            <p class="page-subtitle">
+                {{ activo.nombre }} · {{ activo.tipo }}
+            </p>
+        </div>
+        <a href="{{ url_for('activos') }}" class="btn-secondary">← Volver al inventario</a>
+    </div>
+
+    <div class="grid-container grid-container--two">
+        <div class="card">
+            <h3 class="card-title">Datos del equipo</h3>
+            <dl class="definition-list">
+                <div>
+                    <dt>Nombre</dt>
+                    <dd>{{ activo.nombre }}</dd>
+                </div>
+                <div>
+                    <dt>Tipo</dt>
+                    <dd>{{ activo.tipo }}</dd>
+                </div>
+                <div>
+                    <dt>Marca y modelo</dt>
+                    <dd>{{ activo.marca or '—' }} / {{ activo.modelo or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Número de serie</dt>
+                    <dd>{{ activo.numero_serie or '—' }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Asignación y estado</h3>
+            <dl class="definition-list">
+                <div>
+                    <dt>Responsable</dt>
+                    <dd>{{ activo.responsable or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Departamento</dt>
+                    <dd>{{ activo.departamento_nombre or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Ubicación</dt>
+                    <dd>{{ activo.ubicacion or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Estado actual</dt>
+                    <dd>
+                        <span class="{% if activo.estado == 'Operativo' %}estado-operativo{% elif activo.estado == 'En Mantenimiento' %}estado-mantenimiento{% elif activo.estado == 'Con Falla' %}estado-inactivo{% else %}estado-inactivo{% endif %}">
+                            {{ activo.estado }}
+                        </span>
+                    </dd>
+                </div>
+            </dl>
+
+            {% if puede(session.get('rol'), 'activos', 'editar') %}
+                <div class="card-actions">
+                    <a href="{{ url_for('editar_activo', id=activo.id) }}" class="btn-primary">Editar información</a>
+                    <a href="{{ url_for('generar_resguardo', id=activo.id) }}" target="_blank" class="btn-secondary">Acta en PDF</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <section class="card qr-card">
+        <div class="qr-card-info">
+            <h3 class="card-title">Identificación del activo</h3>
+            <p class="page-subtitle">
+                El código QR abre esta ficha desde un teléfono. Imprímelo en la etiqueta
+                del equipo para consultar su historial sin capturar el identificador.
+            </p>
+            <div class="card-actions">
+                <a href="{{ url_for('etiqueta_activo', id=activo.id) }}" target="_blank" rel="noopener" class="btn-primary">Imprimir etiqueta</a>
+                <a href="{{ url_for('qr_activo', id=activo.id) }}" download="QR-{{ activo.identificador or activo.id }}.svg" class="btn-secondary">Descargar QR</a>
+            </div>
+        </div>
+        <img
+            class="qr-card-imagen"
+            src="{{ url_for('qr_activo', id=activo.id) }}"
+            alt="Código QR para abrir la ficha del activo {{ activo.identificador or activo.id }}"
+            width="132"
+            height="132"
+        >
+    </section>
+
+    <!-- SECCIÓN: HISTORIAL -->
+    <section class="history-section">
+        <div class="history-header">
+            <div>
+                <h3 class="card-title">Historial de movimientos</h3>
+                <p class="page-subtitle">
+                    {{ total_historial }} movimiento(s) registrado(s)
+                    {% if ultimo_movimiento %}
+                        · último el {{ ultimo_movimiento.strftime('%d/%m/%Y %H:%M') }}
+                    {% endif %}
+                </p>
+            </div>
+            {% if total_historial > 0 %}
+                <span class="filter-chip">Trazabilidad completa</span>
+            {% endif %}
+        </div>
+
+        {% if historial %}
+            <ol class="history-timeline">
+                {% for registro in historial %}
+                    {% set tipo = registro.tipo_movimiento|lower %}
+                    <li class="history-item
+                        {% if 'alta' in tipo %}history-item--alta
+                        {% elif 'mantenimiento' in tipo %}history-item--mantenimiento
+                        {% elif 'incidencia' in tipo %}history-item--incidencia
+                        {% else %}history-item--datos{% endif %}">
+                        <div class="history-marker" aria-hidden="true"></div>
+                        <div class="history-content">
+                            <div class="history-top">
+                                <span class="history-badge">
+                                    {{ registro.tipo_movimiento }}
+                                </span>
+                                <time class="history-date" datetime="{{ registro.fecha }}">
+                                    {{ registro.fecha.strftime('%d/%m/%Y %H:%M') }}
+                                </time>
+                            </div>
+                            <p class="history-detail">{{ registro.detalle or 'Sin detalle registrado.' }}</p>
+                            <p class="history-user">
+                                Registrado por
+                                <strong>{{ registro.usuario or 'Usuario eliminado' }}</strong>
+                            </p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <div class="empty-state">
+                <p>No hay movimientos registrados para este equipo todavía.</p>
+                <p class="page-subtitle">
+                    El historial se llena al crear, editar, mantener o reportar fallas sobre el activo.
+                </p>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

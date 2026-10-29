@@ -1,0 +1,147 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+    <!-- LIBRERÍA DE FULLCALENDAR -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
+    <style>
+        /* Adaptar el calendario al tema oscuro de SATE */
+        .fc { color: var(--text-primary); font-family: inherit; }
+        .fc-theme-standard td, .fc-theme-standard th, .fc-theme-standard .fc-scrollgrid { border-color: var(--border-light); }
+        .fc .fc-button-primary { background-color: var(--bg-surface); border-color: var(--border-light); color: var(--text-primary); text-transform: capitalize;}
+        .fc .fc-button-primary:not(:disabled):active, .fc .fc-button-primary:not(:disabled).fc-button-active { background-color: var(--accent-primary); border-color: var(--accent-primary); }
+        .fc .fc-daygrid-day.fc-day-today { background-color: rgba(59, 130, 246, 0.1); }
+        .fc-event { cursor: pointer; border: none; padding: 2px; }
+    </style>
+
+    <div class="page-header">
+        <div>
+            <h2>Control de Mantenimientos</h2>
+            <p class="page-subtitle">
+                Programa, filtra y da seguimiento a los servicios preventivos y correctivos.
+            </p>
+        </div>
+        {% if puede(session.get('rol'), 'mantenimientos', 'crear') %}
+            <a href="{{ url_for('nuevo_mantenimiento') }}" class="btn-primary" style="background-color: var(--warning); color: #000;">+ Programar Mantenimiento</a>
+        {% endif %}
+    </div>
+
+    <form method="GET" action="{{ url_for('mantenimientos') }}" class="filter-bar" role="search">
+        <div class="filter-field filter-field--grow">
+            <label for="q">Buscar</label>
+            <input type="search" id="q" name="q" value="{{ filtros.q }}"
+                   placeholder="Equipo, identificador, descripción o responsable" maxlength="100">
+        </div>
+
+        <div class="filter-field">
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado">
+                <option value="">Todos</option>
+                {% for valor in estados %}
+                    <option value="{{ valor }}" {% if filtros.estado == valor %}selected{% endif %}>{{ valor }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-field">
+            <label for="tipo">Tipo</label>
+            <select id="tipo" name="tipo">
+                <option value="">Todos</option>
+                {% for valor in tipos %}
+                    <option value="{{ valor }}" {% if filtros.tipo == valor %}selected{% endif %}>{{ valor }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-field">
+            <label for="vencimiento">Vencimiento</label>
+            <select id="vencimiento" name="vencimiento">
+                <option value="">Todos</option>
+                <option value="7" {% if filtros.vencimiento == '7' %}selected{% endif %}>Próximos 7 días</option>
+                <option value="vencidos" {% if filtros.vencimiento == 'vencidos' %}selected{% endif %}>Vencidos sin finalizar</option>
+            </select>
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn-primary">Filtrar</button>
+            <a href="{{ url_for('mantenimientos') }}" class="btn-secondary">Limpiar</a>
+        </div>
+    </form>
+
+    <div class="filter-summary">
+        <span>{{ mantenimientos|length }} mantenimiento(s) encontrado(s)</span>
+        {% if filtros.vencimiento == '7' %}
+            <span class="filter-chip">Próximos 7 días</span>
+        {% elif filtros.vencimiento == 'vencidos' %}
+            <span class="filter-chip">Vencidos sin finalizar</span>
+        {% endif %}
+        {% if filtros.q or filtros.estado or filtros.tipo %}
+            <span class="filter-chip">Filtros aplicados</span>
+        {% endif %}
+    </div>
+
+    <!-- CALENDARIO Y TABLA APILADOS PARA EVITAR CORTES -->
+    <div class="stacked-sections">
+
+        <!-- CALENDARIO -->
+        <div class="card" style="padding: 1.5rem; margin-bottom: 0;">
+            <div id='calendario'></div>
+        </div>
+
+        <!-- TABLA -->
+        <div class="table-container" style="margin-top: 0;">
+            <table class="table-compact">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Equipo</th>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th>Responsable</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mant in mantenimientos %}
+                    <tr>
+                        <td class="cell-id">#{{ mant.id }}</td>
+                        <td>
+                            <span class="cell-title">{{ mant.activo_nombre }}</span>
+                            <span class="cell-subtitle">{{ mant.activo_identificador or '—' }}</span>
+                        </td>
+                        <td>{{ mant.tipo }}</td>
+                        <td class="cell-nowrap">{{ mant.fecha_programada.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ mant.responsable }}</td>
+                        <td>
+                            <span class="{% if mant.estado == 'Finalizado' %}estado-operativo{% elif mant.estado == 'En proceso' %}estado-mantenimiento{% else %}estado-pendiente{% endif %}">
+                                {{ mant.estado }}
+                            </span>
+                        </td>
+                        <td class="cell-actions">
+                            <div class="table-actions">
+                                <a href="{{ url_for('detalle_mantenimiento', id=mant.id) }}" class="btn-primary btn-small">Ver</a>
+                                {% if puede(session.get('rol'), 'mantenimientos', 'editar') %}
+                                    <a href="{{ url_for('editar_mantenimiento', id=mant.id) }}" class="btn-primary btn-small" style="background-color: var(--warning); color: #000;">Editar</a>
+                                {% endif %}
+                                <a href="{{ url_for('orden_mantenimiento_pdf', id=mant.id) }}" target="_blank" class="btn-primary btn-small" style="background-color: var(--info);">PDF</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                            No hay mantenimientos que coincidan con los filtros.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- DATOS INVISIBLES PARA JAVASCRIPT -->
+    <div id="datos-eventos" style="display: none;" data-eventos="{{ mantenimientos_json | tojson | forceescape }}"></div>
+
+    <!-- ENLACE A TU SCRIPT EXTERNO -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

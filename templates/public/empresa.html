@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Empresa | TechTrack Solutions{% endblock %}
+{% block description %}Conoce a TechTrack Solutions: giro, misión, visión, objetivos, propuesta de valor y organigrama.{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <p class="eyebrow">La empresa</p>
+    <h1>TechTrack Solutions</h1>
+    <p class="page-lead">
+        Somos una empresa de tecnología dedicada a que las organizaciones tengan control
+        y trazabilidad de sus equipos. Nuestro producto principal es SATE.
+    </p>
+</section>
+
+<section class="section-block">
+    <div class="split-layout">
+        <div>
+            <p class="eyebrow">Quiénes somos</p>
+            <h2 class="section-title">Tecnología con propósito operativo</h2>
+            <p>{{ empresa.descripcion }}</p>
+            <p>
+                Trabajamos con un modelo de gestión preventiva: registrar, medir y anticipar
+                para que los equipos duren más y las decisiones se tomen con información.
+            </p>
+        </div>
+        <div class="info-card">
+            <h3>Datos generales</h3>
+            <dl class="definition-list">
+                <dt>Giro</dt>
+                <dd>{{ empresa.giro }}</dd>
+                <dt>Producto principal</dt>
+                <dd>SATE — Sistema de Administración y Trazabilidad de Equipos</dd>
+                <dt>Clientes objetivo</dt>
+                <dd>{{ empresa.clientes }}</dd>
+                <dt>Propuesta de valor</dt>
+                <dd>{{ empresa.propuesta }}</dd>
+            </dl>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="grid-container grid-container--two">
+        <article class="card statement-card">
+            <p class="eyebrow">Misión</p>
+            <h3>Gestión eficiente y preventiva</h3>
+            <p>{{ empresa.mision }}</p>
+        </article>
+        <article class="card statement-card">
+            <p class="eyebrow">Visión</p>
+            <h3>Reconocimiento en trazabilidad</h3>
+            <p>{{ empresa.vision }}</p>
+        </article>
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="section-heading-group">
+        <p class="eyebrow">Objetivos</p>
+        <h2 class="section-title">Qué busca la empresa y qué busca SATE</h2>
+    </div>
+
+    <div class="split-layout">
+        <div>
+            <h3 class="subheading">Objetivos de la empresa y de SATE</h3>
+            <ul class="check-list">
+                {% for objetivo in empresa.objetivos %}
+                <li>{{ objetivo }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div>
+            <h3 class="subheading">Metas clave del producto</h3>
+            <ul class="check-list">
+                {% for meta in empresa.metas %}
+                <li>{{ meta }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading-group">
+        <p class="eyebrow">Organigrama</p>
+        <h2 class="section-title">Cómo se organiza TechTrack Solutions</h2>
+        <p class="section-subtitle">
+            La Dirección General coordina las áreas principales de SIT, Redes y Desarrollo.
+            Soporte depende de Desarrollo según el organigrama, pero opera con funciones
+            propias de atención a usuarios.
+        </p>
+    </div>
+
+    <div class="org-chart" role="img" aria-label="Organigrama: Dirección General coordina SIT, Redes y Desarrollo; Soporte depende de Desarrollo">
+        <div class="org-level">
+            <div class="org-box org-box--root">
+                <span class="org-box-title">Dirección General</span>
+                <span class="org-box-text">Coordinación estratégica</span>
+            </div>
+        </div>
+
+        <div class="org-connector" aria-hidden="true"></div>
+
+        <div class="org-level org-level--areas">
+            <a class="org-box" href="{{ url_for('detalle_departamento', slug='sit') }}">
+                <span class="org-box-title">SIT</span>
+                <span class="org-box-text">Activos tecnológicos</span>
+            </a>
+            <a class="org-box" href="{{ url_for('detalle_departamento', slug='redes') }}">
+                <span class="org-box-title">Redes</span>
+                <span class="org-box-text">Infraestructura y seguridad</span>
+            </a>
+            <div class="org-area-with-child">
+                <a class="org-box" href="{{ url_for('detalle_departamento', slug='desarrollo') }}">
+                    <span class="org-box-title">Desarrollo</span>
+                    <span class="org-box-text">Sistema SATE</span>
+                </a>
+                <div class="org-child-connector" aria-hidden="true"></div>
+                <a class="org-box org-box--child" href="{{ url_for('detalle_departamento', slug='soporte') }}">
+                    <span class="org-box-title">Soporte</span>
+                    <span class="org-box-text">Atención a usuarios</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="section-heading-group">
+        <p class="eyebrow">Departamentos</p>
+        <h2 class="section-title">Cuatro áreas, una operación</h2>
+    </div>
+
+    <div class="grid-container">
+        {% for slug, departamento in departamentos.items() %}
+        <a class="card link-card" href="{{ url_for('detalle_departamento', slug=slug) }}">
+            <h3>{{ departamento.nombre }}</h3>
+            <p>{{ departamento.funcion }}</p>
+            <span class="card-link">Conocer el área →</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

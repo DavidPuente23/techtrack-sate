@@ -1,0 +1,393 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block title %}Panel principal - {{ app_name }}{% endblock %}
+
+{% block content %}
+    <!-- Script de Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <div class="page-heading dashboard-heading">
+        <div>
+            <p class="page-eyebrow">Panel principal</p>
+            <h2>Hola, {{ nombre }}</h2>
+            <p class="page-subtitle">{{ descripcion_rol }}</p>
+        </div>
+        <span class="role-badge">{{ session.get('rol', '') }}</span>
+    </div>
+
+    {% if es_solicitante %}
+    <div class="scope-note">
+        <span class="scope-note-icon" aria-hidden="true">🔎</span>
+        <p>
+            <strong>Alcance de tu cuenta:</strong>
+            {% if departamento_nombre %}activos de {{ departamento_nombre }} y {% endif %}solo tus propias incidencias.
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- ALERTAS PROACTIVAS -->
+    {% set mostrar_alerta_mant = alertas_mant > 0 and puede(session.get('rol'), 'mantenimientos', 'ver') %}
+    {% set mostrar_alerta_prox = mants_proximos > 0 and puede(session.get('rol'), 'mantenimientos', 'ver') %}
+    {% set mostrar_alerta_inc = alertas_inc > 0 and puede(session.get('rol'), 'incidencias', 'ver') %}
+    {% if mostrar_alerta_mant or mostrar_alerta_prox or mostrar_alerta_inc %}
+    <div class="alert-panel" role="status">
+        <span class="alert-panel-icon" aria-hidden="true">⚠️</span>
+        <div class="alert-panel-body">
+            <h3>Requiere tu atención</h3>
+            <ul>
+                {% if mostrar_alerta_mant %}
+                <li>
+                    <strong>{{ alertas_mant }}</strong> mantenimiento(s) vencido(s) sin finalizar.
+                    <a href="{{ url_for('mantenimientos', vencimiento='vencidos') }}">Revisar</a>
+                </li>
+                {% endif %}
+                {% if mostrar_alerta_prox %}
+                <li>
+                    <strong>{{ mants_proximos }}</strong> mantenimiento(s) por vencer en los próximos 7 días.
+                    <a href="{{ url_for('mantenimientos', vencimiento='7') }}">Programar</a>
+                </li>
+                {% endif %}
+                {% if mostrar_alerta_inc %}
+                <li>
+                    <strong>{{ alertas_inc }}</strong> incidencia(s) crítica(s) abierta(s) desde hace más de 24 horas.
+                    <a href="{{ url_for('incidencias', prioridad='Crítica') }}">Revisar</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- TARJETAS DE INDICADORES -->
+    <section class="kpi-grid" aria-label="Indicadores principales">
+        {% if puede(session.get('rol'), 'activos', 'ver') %}
+        <a class="kpi-card" href="{{ url_for('activos') }}">
+            <span class="kpi-label">{% if es_solicitante %}Activos de mi área{% else %}Activos registrados{% endif %}</span>
+            <span class="kpi-value">{{ total_activos }}</span>
+            <span class="kpi-hint">{{ activos_operativos }} operativo(s) · Ver inventario →</span>
+        </a>
+        {% endif %}
+
+        {% if puede(session.get('rol'), 'mantenimientos', 'ver') %}
+        <a class="kpi-card kpi-card--warning" href="{{ url_for('mantenimientos') }}">
+            <span class="kpi-label">Mantenimientos pendientes</span>
+            <span class="kpi-value">{{ mants_pendientes }}</span>
+            <span class="kpi-hint">{{ alertas_mant }} vencido(s) · {{ mants_proximos }} por vencer · Ver mantenimientos →</span>
+        </a>
+        {% endif %}
+
+        {% if puede(session.get('rol'), 'incidencias', 'ver') %}
+        <a class="kpi-card kpi-card--danger" href="{{ url_for('incidencias') }}">
+            <span class="kpi-label">{% if es_solicitante %}Mis incidencias abiertas{% else %}Incidencias abiertas{% endif %}</span>
+            <span class="kpi-value">{{ incidencias_abiertas }}</span>
+            <span class="kpi-hint">{{ alertas_inc }} crítica(s) +24 h · Ver incidencias →</span>
+        </a>
+        {% endif %}
+
+        {% if puede(session.get('rol'), 'usuarios', 'ver') %}
+        <a class="kpi-card kpi-card--success" href="{{ url_for('usuarios') }}">
+            <span class="kpi-label">Usuarios activos</span>
+            <span class="kpi-value">{{ usuarios_activos }}</span>
+            <span class="kpi-hint">Cuentas habilitadas · Gestionar →</span>
+        </a>
+        {% endif %}
+    </section>
+
+    <div class="dashboard-layout">
+        <!-- ACTIVIDAD RECIENTE -->
+        <section class="card dashboard-card dashboard-card--activity" aria-labelledby="titulo-actividad">
+            <div class="dashboard-card-head">
+                <div>
+                    <h3 id="titulo-actividad">Actividad reciente</h3>
+                    <p class="dashboard-card-sub">Últimos movimientos y pendientes dentro de tu alcance.</p>
+                </div>
+            </div>
+
+            {% if puede(session.get('rol'), 'incidencias', 'ver') %}
+            <div class="activity-block">
+                <div class="activity-block-head">
+                    <h4>{% if es_solicitante %}Mis incidencias recientes{% else %}Incidencias recientes{% endif %}</h4>
+                    <a href="{{ url_for('incidencias') }}">Ver todas</a>
+                </div>
+                {% if actividad_incidencias %}
+                <ul class="activity-list">
+                    {% for item in actividad_incidencias %}
+                    {% set clase_prioridad = 'danger' if item.prioridad == 'Crítica' else ('warning' if item.prioridad == 'Alta' else ('info' if item.prioridad == 'Media' else '')) %}
+                    <li class="activity-item">
+                        <span class="activity-dot activity-dot--inc" aria-hidden="true"></span>
+                        <div class="activity-body">
+                            <div class="activity-top">
+                                <a class="activity-title" href="{{ url_for('detalle_incidencia', id=item.id) }}">
+                                    #{{ item.id }} · {{ item.activo_nombre }}
+                                </a>
+                                <span class="activity-date">{{ item.fecha_registro.strftime('%d/%m/%Y %H:%M') }}</span>
+                            </div>
+                            <p class="activity-desc">{{ item.descripcion | truncate(110, True, '…') }}</p>
+                            <div class="activity-meta">
+                                <span class="status-pill">{{ item.estado }}</span>
+                                <span class="status-pill{% if clase_prioridad %} status-pill--{{ clase_prioridad }}{% endif %}">{{ item.prioridad }}</span>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="empty-inline">No hay incidencias registradas en tu alcance.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if puede(session.get('rol'), 'mantenimientos', 'ver') %}
+            <div class="activity-block">
+                <div class="activity-block-head">
+                    <h4>Mantenimientos próximos</h4>
+                    <a href="{{ url_for('mantenimientos') }}">Ver todos</a>
+                </div>
+                {% if actividad_mantenimientos %}
+                <ul class="activity-list">
+                    {% for item in actividad_mantenimientos %}
+                    <li class="activity-item">
+                        <span class="activity-dot activity-dot--mant" aria-hidden="true"></span>
+                        <div class="activity-body">
+                            <div class="activity-top">
+                                <a class="activity-title" href="{{ url_for('detalle_mantenimiento', id=item.id) }}">
+                                    {{ item.activo_nombre }}
+                                </a>
+                                <span class="activity-date">{{ item.fecha_programada.strftime('%d/%m/%Y') }}</span>
+                            </div>
+                            <div class="activity-meta">
+                                <span class="status-pill">{{ item.tipo }}</span>
+                                <span class="status-pill">{{ item.estado }}</span>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="empty-inline">No hay mantenimientos pendientes.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if puede(session.get('rol'), 'activos', 'ver') %}
+            <div class="activity-block">
+                <div class="activity-block-head">
+                    <h4>Movimientos de activos</h4>
+                    <a href="{{ url_for('activos') }}">Ver inventario</a>
+                </div>
+                {% if actividad_activos %}
+                <ul class="activity-list">
+                    {% for item in actividad_activos %}
+                    <li class="activity-item">
+                        <span class="activity-dot activity-dot--act" aria-hidden="true"></span>
+                        <div class="activity-body">
+                            <div class="activity-top">
+                                <a class="activity-title" href="{{ url_for('detalle_activo', id=item.activo_id) }}">
+                                    {{ item.activo_nombre }}
+                                </a>
+                                <span class="activity-date">{{ item.fecha.strftime('%d/%m/%Y %H:%M') }}</span>
+                            </div>
+                            <p class="activity-desc">
+                                <strong>{{ item.tipo_movimiento }}</strong>{% if item.detalle %} · {{ item.detalle | truncate(100, True, '…') }}{% endif %}
+                            </p>
+                            <p class="activity-meta-text">Registrado por {{ item.usuario_nombre or 'Sistema' }}</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="empty-inline">Todavía no hay movimientos registrados.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </section>
+
+        <aside class="dashboard-side">
+            <!-- ACCESOS RÁPIDOS -->
+            <section class="card dashboard-card" aria-labelledby="titulo-accesos">
+                <div class="dashboard-card-head">
+                    <div>
+                        <h3 id="titulo-accesos">Accesos rápidos</h3>
+                        <p class="dashboard-card-sub">Solo verás las acciones permitidas para tu rol.</p>
+                    </div>
+                </div>
+                <div class="quick-actions">
+                    {% if puede(session.get('rol'), 'activos', 'crear') %}
+                    <a class="quick-action quick-action--primary" href="{{ url_for('nuevo_activo') }}">
+                        <span aria-hidden="true">+</span> Registrar activo
+                    </a>
+                    {% endif %}
+                    {% if puede(session.get('rol'), 'mantenimientos', 'crear') %}
+                    <a class="quick-action quick-action--primary" href="{{ url_for('nuevo_mantenimiento') }}">
+                        <span aria-hidden="true">+</span> Programar mantenimiento
+                    </a>
+                    {% endif %}
+                    {% if puede(session.get('rol'), 'incidencias', 'crear') %}
+                    <a class="quick-action quick-action--primary" href="{{ url_for('nueva_incidencia') }}">
+                        <span aria-hidden="true">+</span> Reportar incidencia
+                    </a>
+                    {% endif %}
+
+                    {% if puede(session.get('rol'), 'activos', 'ver') %}
+                    <a class="quick-action" href="{{ url_for('activos') }}">Ver inventario</a>
+                    {% endif %}
+                    {% if puede(session.get('rol'), 'mantenimientos', 'ver') %}
+                    <a class="quick-action" href="{{ url_for('mantenimientos') }}">Ver mantenimientos</a>
+                    {% endif %}
+                    {% if puede(session.get('rol'), 'incidencias', 'ver') %}
+                    <a class="quick-action" href="{{ url_for('incidencias') }}">Ver incidencias</a>
+                    {% endif %}
+                    {% if puede(session.get('rol'), 'usuarios', 'ver') %}
+                    <a class="quick-action" href="{{ url_for('usuarios') }}">Gestionar usuarios</a>
+                    {% endif %}
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <div class="dashboard-charts">
+        <!-- GRÁFICA: ESTADO DEL INVENTARIO -->
+        <section class="card dashboard-card" aria-labelledby="titulo-grafica-estados">
+            <div class="dashboard-card-head">
+                <h3 id="titulo-grafica-estados">Estado del inventario</h3>
+            </div>
+            {% if total_activos > 0 %}
+            <div class="chart-box">
+                <canvas id="graficaEstados" role="img" aria-label="Distribución de activos por estado"></canvas>
+            </div>
+            {% else %}
+            <div class="empty-state empty-state--compact">
+                <p><strong>Sin activos registrados</strong></p>
+                <p>Cuando registres equipos verás aquí su distribución por estado.</p>
+                {% if puede(session.get('rol'), 'activos', 'crear') %}
+                <a class="btn-secondary btn-small" href="{{ url_for('nuevo_activo') }}">Registrar el primero</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </section>
+
+        <!-- GRÁFICA: INCIDENCIAS POR ESTADO -->
+        {% if puede(session.get('rol'), 'incidencias', 'ver') %}
+        <section class="card dashboard-card" aria-labelledby="titulo-grafica-incidencias">
+            <div class="dashboard-card-head">
+                <h3 id="titulo-grafica-incidencias">Incidencias por estado</h3>
+            </div>
+            {% if total_incidencias > 0 %}
+            <div class="chart-box">
+                <canvas id="graficaIncidencias" role="img" aria-label="Distribución de incidencias por estado"></canvas>
+            </div>
+            {% else %}
+            <div class="empty-state empty-state--compact">
+                <p><strong>Sin incidencias</strong></p>
+                <p>No hay incidencias registradas en tu alcance.</p>
+                {% if puede(session.get('rol'), 'incidencias', 'crear') %}
+                <a class="btn-secondary btn-small" href="{{ url_for('nueva_incidencia') }}">Reportar una incidencia</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </section>
+        {% endif %}
+    </div>
+
+    <!-- CONTENEDOR INVISIBLE DE DATOS PARA JS -->
+    <div id="datos-graficas" hidden
+         data-nombres-estados="{{ nombres_estados | tojson | forceescape }}"
+         data-cantidades-estados="{{ cantidades_estados | tojson | forceescape }}"
+         data-nombres-estados-inc="{{ nombres_estados_inc | tojson | forceescape }}"
+         data-cantidades-estados-inc="{{ cantidades_estados_inc | tojson | forceescape }}">
+    </div>
+
+    <!-- INICIALIZACIÓN DE CHART.JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const contenedor = document.getElementById('datos-graficas');
+            if (!contenedor || typeof Chart === 'undefined') {
+                return;
+            }
+
+            const leer = function (clave) {
+                try {
+                    return JSON.parse(contenedor.dataset[clave] || '[]');
+                } catch (error) {
+                    return [];
+                }
+            };
+
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+
+            const coloresEstados = {
+                'Operativo': '#10b981',
+                'En Mantenimiento': '#f59e0b',
+                'Con Falla': '#ef4444',
+                'Baja': '#64748b'
+            };
+
+            const canvasEstados = document.getElementById('graficaEstados');
+            if (canvasEstados) {
+                const etiquetas = leer('nombresEstados');
+                new Chart(canvasEstados, {
+                    type: 'doughnut',
+                    data: {
+                        labels: etiquetas,
+                        datasets: [{
+                            data: leer('cantidadesEstados'),
+                            backgroundColor: etiquetas.map(function (estado) {
+                                return coloresEstados[estado] || '#3b82f6';
+                            }),
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        cutout: '68%'
+                    }
+                });
+            }
+
+            const coloresIncidencias = {
+                'Nueva': '#3b82f6',
+                'Asignada': '#8b5cf6',
+                'En proceso': '#f59e0b',
+                'Resuelta': '#10b981',
+                'Cerrada': '#64748b'
+            };
+
+            const canvasIncidencias = document.getElementById('graficaIncidencias');
+            if (canvasIncidencias) {
+                const etiquetas = leer('nombresEstadosInc');
+                new Chart(canvasIncidencias, {
+                    type: 'bar',
+                    data: {
+                        labels: etiquetas,
+                        datasets: [{
+                            label: 'Incidencias',
+                            data: leer('cantidadesEstadosInc'),
+                            backgroundColor: etiquetas.map(function (estado) {
+                                return coloresIncidencias[estado] || '#3b82f6';
+                            }),
+                            borderRadius: 6,
+                            barThickness: 28
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                                ticks: { stepSize: 1, precision: 0 }
+                            },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

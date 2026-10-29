@@ -1,0 +1,53 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Registrar Nuevo Usuario</h2>
+        <a href="{{ url_for('usuarios') }}" class="btn-secondary">← Volver a usuarios</a>
+    </div>
+
+    <div class="form-container">
+        <form method="POST" action="{{ url_for('nuevo_usuario') }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+            <label for="nombre">Nombre completo:</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ej. Roberto Sánchez" required>
+
+            <label for="email">Correo electrónico (servirá para iniciar sesión):</label>
+            <input type="email" id="email" name="email" placeholder="roberto@techtrack.com" required>
+
+            <label for="password">Contraseña temporal:</label>
+            <input type="password" id="password" name="password" minlength="8" required>
+            <p class="form-help">Mínimo 8 caracteres. El usuario deberá cambiarla en su primer acceso.</p>
+
+            <label for="departamento_id">Departamento:</label>
+            <select id="departamento_id" name="departamento_id" required>
+                <option value="" disabled selected>-- Selecciona un área --</option>
+                {% for depto in departamentos %}
+                    <option value="{{ depto.id }}">{{ depto.nombre }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="rol_id">Rol en SATE:</label>
+            <select id="rol_id" name="rol_id" required>
+                <option value="" disabled selected>-- Nivel de acceso --</option>
+                {% for rol in roles %}
+                    <option value="{{ rol.id }}">{{ rol.nombre }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem; padding: 1rem; border: none; cursor: pointer;">Crear Cuenta</button>
+            <a href="{{ url_for('usuarios') }}" style="display: block; text-align: center; margin-top: 1rem; color: var(--text-secondary); text-decoration: none;">Cancelar</a>
+        </form>
+    </div>
+
+    <div class="card" style="margin-top: 1.5rem;">
+        <h3>Roles disponibles</h3>
+        <dl class="definition-list">
+            {% for rol in roles %}
+            <dt>{{ rol.nombre }}</dt>
+            <dd>{{ descripciones.get(rol.nombre, 'Rol del sistema.') }}</dd>
+            {% endfor %}
+        </dl>
+    </div>
+{% endblock %}

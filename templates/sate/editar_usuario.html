@@ -1,0 +1,104 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Editar usuario: {{ usuario.nombre }}</h2>
+        <a href="{{ url_for('usuarios') }}" class="btn-secondary">← Volver a usuarios</a>
+    </div>
+
+    <div class="grid-container">
+        <div class="form-container">
+            <h3 class="section-title">Datos de la cuenta</h3>
+            <form method="POST" action="{{ url_for('editar_usuario', id=usuario.id) }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+                <label for="nombre">Nombre completo:</label>
+                <input type="text" id="nombre" name="nombre" value="{{ usuario.nombre }}" required>
+
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" name="email" value="{{ usuario.email }}" required>
+
+                <label for="departamento_id">Departamento:</label>
+                <select id="departamento_id" name="departamento_id" required>
+                    {% for depto in departamentos %}
+                    <option value="{{ depto.id }}" {% if depto.id == usuario.departamento_id %}selected{% endif %}>
+                        {{ depto.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <label for="rol_id">Rol en SATE:</label>
+                <select id="rol_id" name="rol_id" required {% if usuario.id == session.get('usuario_id') %}disabled{% endif %}>
+                    {% for rol in roles %}
+                    <option value="{{ rol.id }}" {% if rol.id == usuario.rol_id %}selected{% endif %}>
+                        {{ rol.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if usuario.id == session.get('usuario_id') %}
+                    <input type="hidden" name="rol_id" value="{{ usuario.rol_id }}">
+                    <p class="form-help">No puedes cambiar tu propio rol. Pídeselo a otro administrador.</p>
+                {% else %}
+                    <p class="form-help">{{ descripciones.get(usuario.rol_nombre, '') }}</p>
+                {% endif %}
+
+                <button type="submit" class="btn-primary btn-block">Guardar cambios</button>
+            </form>
+        </div>
+
+        <div>
+            <div class="card">
+                <h3>Estado de la cuenta</h3>
+                <dl class="definition-list">
+                    <dt>Rol actual</dt>
+                    <dd>{{ usuario.rol_nombre or 'Sin rol' }}</dd>
+                    <dt>Estado</dt>
+                    <dd>
+                        <span class="{% if usuario.activo %}estado-activo{% else %}estado-inactivo{% endif %}">
+                            {% if usuario.activo %}Activo{% else %}Inactivo{% endif %}
+                        </span>
+                    </dd>
+                    <dt>Último acceso</dt>
+                    <dd>{{ usuario.ultimo_acceso or 'Nunca' }}</dd>
+                    <dt>Fecha de registro</dt>
+                    <dd>{{ usuario.fecha_registro }}</dd>
+                    <dt>Contraseña</dt>
+                    <dd>
+                        {% if usuario.debe_cambiar_password %}
+                            Temporal, debe cambiarla al entrar.
+                        {% else %}
+                            Definida por el usuario.
+                        {% endif %}
+                    </dd>
+                </dl>
+
+                {% if usuario.id != session.get('usuario_id') %}
+                <form method="POST"
+                      action="{{ url_for('cambiar_estado_usuario', id=usuario.id) }}"
+                      onsubmit="return confirm('¿{{ 'Desactivar' if usuario.activo else 'Activar' }} esta cuenta?');"
+                      style="margin-top: 1rem;">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="btn-secondary btn-block">
+                        {% if usuario.activo %}Desactivar cuenta{% else %}Activar cuenta{% endif %}
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+
+            {% if usuario.id != session.get('usuario_id') %}
+            <div class="card" style="margin-top: 1rem;">
+                <h3>Restablecer contraseña</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                    Asigna una contraseña temporal. El usuario deberá cambiarla en su siguiente acceso.
+                </p>
+                <form method="POST" action="{{ url_for('restablecer_password_usuario', id=usuario.id) }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                    <label for="password">Nueva contraseña temporal:</label>
+                    <input type="password" id="password" name="password" minlength="8" required>
+                    <button type="submit" class="btn-primary btn-block" style="margin-top: 1rem;">Restablecer contraseña</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

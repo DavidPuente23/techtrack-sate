@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ perfil.nombre }} | Perfiles de TechTrack Solutions{% endblock %}
+{% block description %}{{ perfil.objetivo }}{% endblock %}
+
+{% block content %}
+<nav class="breadcrumbs" aria-label="Ruta de navegación">
+    <a href="{{ url_for('inicio') }}">Inicio</a>
+    <span aria-hidden="true">/</span>
+    <a href="{{ url_for('trabaja_con_nosotros') }}">Trabaja con nosotros</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{{ perfil.nombre }}</span>
+</nav>
+
+<section class="page-hero page-hero--compact">
+    <p class="eyebrow">Perfil profesional</p>
+    <h1>{{ perfil.nombre }}</h1>
+    <p class="page-lead">{{ perfil.objetivo }}</p>
+
+    <div class="meta-row">
+        <span class="status-pill status-pill--info">
+            Departamento: {{ departamentos[perfil.departamento].nombre }}
+        </span>
+        <span class="status-pill">Reporta a: {{ perfil.reporta_a }}</span>
+        <span class="status-pill">Jornada: {{ perfil.jornada }}</span>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="profile-detail-grid">
+        <article class="detail-block">
+            <h2 class="section-title">Funciones principales</h2>
+            <ul class="check-list">
+                {% for funcion in perfil.funciones %}
+                <li>{{ funcion }}</li>
+                {% endfor %}
+            </ul>
+        </article>
+
+        <aside class="info-card">
+            <h3>Datos del puesto</h3>
+            <dl class="definition-list">
+                <dt>Nombre del puesto</dt>
+                <dd>{{ perfil.nombre }}</dd>
+                <dt>Departamento</dt>
+                <dd>{{ departamentos[perfil.departamento].nombre }}</dd>
+                <dt>Jefe inmediato</dt>
+                <dd>{{ perfil.reporta_a }}</dd>
+                <dt>Jornada</dt>
+                <dd>{{ perfil.jornada }}</dd>
+            </dl>
+        </aside>
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="section-heading-group">
+        <p class="eyebrow">Requisitos</p>
+        <h2 class="section-title">Qué se requiere para el puesto</h2>
+    </div>
+
+    <div class="profile-requirements-grid">
+        <article class="detail-block">
+            <h3 class="subheading">Escolaridad</h3>
+            <p>{{ perfil.escolaridad }}</p>
+
+            <h3 class="subheading">Experiencia</h3>
+            <p>{{ perfil.experiencia }}</p>
+        </article>
+
+        <article class="detail-block">
+            <h3 class="subheading">Conocimientos técnicos</h3>
+            <ul class="check-list">
+                {% for conocimiento in perfil.conocimientos %}
+                <li>{{ conocimiento }}</li>
+                {% endfor %}
+            </ul>
+        </article>
+
+        <article class="detail-block">
+            <h3 class="subheading">Competencias profesionales</h3>
+            <ul class="check-list">
+                {% for competencia in perfil.competencias %}
+                <li>{{ competencia }}</li>
+                {% endfor %}
+            </ul>
+        </article>
+
+        <article class="detail-block">
+            <h3 class="subheading">Herramientas que utiliza</h3>
+            <ul class="check-list">
+                {% for herramienta in perfil.herramientas %}
+                <li>{{ herramienta }}</li>
+                {% endfor %}
+            </ul>
+        </article>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="split-layout">
+        <div>
+            <p class="eyebrow">Solicitud</p>
+            <h2 class="section-title">Enviar solicitud para este perfil</h2>
+            <p>
+                Este formulario es una simulación del proceso de postulación. La información
+                se almacena para fines de demostración del proyecto.
+            </p>
+            <p class="notice-inline">
+                Perfil de ejemplo. No es una vacante laboral real.
+            </p>
+        </div>
+
+        <div class="card form-card">
+            <form method="POST" action="{{ url_for('detalle_perfil', slug=perfil.slug) }}" class="stacked-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+                <div>
+                    <label for="nombre">Nombre completo:</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+
+                <div>
+                    <label for="correo">Correo electrónico:</label>
+                    <input type="email" id="correo" name="correo" required>
+                </div>
+
+                <div>
+                    <label for="telefono">Teléfono:</label>
+                    <input type="text" id="telefono" name="telefono">
+                </div>
+
+                <div>
+                    <label for="mensaje">Mensaje o enlace a CV:</label>
+                    <textarea id="mensaje" name="mensaje" rows="4"></textarea>
+                </div>
+
+                <div class="checkbox-row">
+                    <input type="checkbox" id="privacidad" name="acepta_privacidad" value="1" required>
+                    <label for="privacidad">Acepto el <a href="{{ url_for('privacidad') }}">Aviso de Privacidad</a></label>
+                </div>
+
+                <button type="submit" class="btn-primary">Enviar solicitud</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="inline-actions">
+        <a href="{{ url_for('trabaja_con_nosotros') }}" class="btn-secondary">← Volver a perfiles</a>
+        <a href="{{ url_for('detalle_departamento', slug=perfil.departamento) }}" class="btn-secondary">
+            Ver departamento: {{ departamentos[perfil.departamento].nombre }}
+        </a>
+    </div>
+</section>
+{% endblock %}

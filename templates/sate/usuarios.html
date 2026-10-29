@@ -1,0 +1,87 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap;">
+        <div>
+            <h2>Usuarios y Roles</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                Administra las cuentas y el nivel de acceso de cada persona a SATE.
+            </p>
+        </div>
+        {% if puede(session.get('rol'), 'usuarios', 'crear') %}
+            <a href="{{ url_for('nuevo_usuario') }}" class="btn-primary">+ Nuevo Usuario</a>
+        {% endif %}
+    </div>
+
+    <div class="table-container">
+        <table class="table-compact">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Departamento</th>
+                    <th>Rol de acceso</th>
+                    <th>Estado</th>
+                    <th>Último acceso</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in usuarios %}
+                <tr>
+                    <td>
+                        <span class="cell-title">
+                            {{ user.nombre }}
+                            {% if user.id == session.get('usuario_id') %}
+                                <span class="status-pill">Tú</span>
+                            {% endif %}
+                        </span>
+                        <span class="cell-subtitle">{{ user.email }}</span>
+                    </td>
+                    <td>{{ user.departamento or '—' }}</td>
+                    <td><span class="status-pill status-pill--info">{{ user.rol or 'Sin rol' }}</span></td>
+                    <td>
+                        <span class="{% if user.activo %}estado-activo{% else %}estado-inactivo{% endif %}">
+                            {% if user.activo %}Activo{% else %}Inactivo{% endif %}
+                        </span>
+                        {% if user.debe_cambiar_password %}
+                            <span class="status-pill" title="Debe cambiar la contraseña al iniciar sesión">Temporal</span>
+                        {% endif %}
+                    </td>
+                    <td class="cell-nowrap">{{ user.ultimo_acceso or 'Nunca' }}</td>
+                    <td>
+                        <div class="table-actions">
+                            {% if puede(session.get('rol'), 'usuarios', 'editar') %}
+                                <a href="{{ url_for('editar_usuario', id=user.id) }}" class="btn-primary btn-small">Editar</a>
+                            {% endif %}
+
+                            {% if puede(session.get('rol'), 'usuarios', 'administrar') and user.id != session.get('usuario_id') %}
+                                <form method="POST"
+                                      action="{{ url_for('cambiar_estado_usuario', id=user.id) }}"
+                                      onsubmit="return confirm('¿{{ 'Desactivar' if user.activo else 'Activar' }} la cuenta de {{ user.nombre }}?');">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                                    <button type="submit" class="btn-secondary btn-small">
+                                        {% if user.activo %}Desactivar{% else %}Activar{% endif %}
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-secondary);">No hay usuarios registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card" style="margin-top: 1.5rem;">
+        <h3>Reglas de administración</h3>
+        <ul class="check-list">
+            <li>No se puede desactivar la propia cuenta ni quitar el rol al último administrador general activo.</li>
+            <li>Las cuentas nuevas y las contraseñas restablecidas son temporales: el usuario debe cambiarlas al entrar.</li>
+            <li>El rol Usuario Solicitante solo consulta los activos de su departamento y sus propias incidencias.</li>
+        </ul>
+    </div>
+{% endblock %}

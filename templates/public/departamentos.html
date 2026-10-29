@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Departamentos | TechTrack Solutions{% endblock %}
+{% block description %}Conoce los departamentos de TechTrack Solutions: SIT, Redes, Desarrollo y Soporte, sus funciones y políticas.{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <p class="eyebrow">Estructura organizacional</p>
+    <h1>Departamentos</h1>
+    <p class="page-lead">
+        Cuatro áreas con funciones diferenciadas que colaboran para administrar los
+        activos tecnológicos, mantener la infraestructura, desarrollar SATE y atender
+        a los usuarios.
+    </p>
+</section>
+
+<section class="section-block">
+    <div class="grid-container">
+        {% for slug, departamento in departamentos.items() %}
+        <article class="card department-card">
+            <div class="card-header">
+                <span class="department-badge">{{ departamento.nombre }}</span>
+                <span class="card-count">{{ departamento.politicas_responsable|length }} políticas responsables</span>
+            </div>
+            <h3>{{ departamento.nombre_largo }}</h3>
+            <p>{{ departamento.funcion }}</p>
+            <p class="card-meta"><strong>Objetivo:</strong> {{ departamento.objetivo }}</p>
+
+            <div class="card-actions">
+                <a href="{{ url_for('detalle_departamento', slug=slug) }}" class="btn-primary">Conocer el área</a>
+                {% set perfil = perfiles[departamento.perfil] %}
+                <a href="{{ url_for('detalle_perfil', slug=perfil.slug) }}" class="btn-secondary">Ver perfil</a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="split-layout">
+        <div>
+            <p class="eyebrow">Cómo leer esta sección</p>
+            <h2 class="section-title">Cada área tiene políticas y un perfil de puesto</h2>
+            <p>
+                En la ficha de cada departamento encontrarás su objetivo, sus funciones
+                principales, las políticas que lidera, aquellas en las que participa y
+                el perfil profesional asociado.
+            </p>
+        </div>
+        <div class="info-card">
+            <h3>Matriz de responsabilidad</h3>
+            <p>
+                Una política puede tener un área responsable y varias áreas participantes.
+                La matriz completa está disponible en la sección de políticas.
+            </p>
+            <a href="{{ url_for('politicas') }}" class="btn-secondary">Ver matriz de políticas</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

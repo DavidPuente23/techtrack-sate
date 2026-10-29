@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Error interno - TechTrack Solutions{% endblock %}
+
+{% block content %}
+<section class="content-section error-page">
+    <h1 class="error-code">500</h1>
+    <h2>Error interno del servidor</h2>
+    <p class="error-text">
+        Ocurrió un problema inesperado al procesar tu solicitud.
+    </p>
+    <p class="error-text">
+        Inténtalo de nuevo en unos momentos. Si el problema continúa,
+        contacta al administrador del sistema.
+    </p>
+    <a href="{{ url_for('inicio') }}" class="btn-primary">Volver al Inicio</a>
+</section>
+{% endblock %}

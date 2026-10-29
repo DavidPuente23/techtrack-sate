@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TechTrack Solutions{% endblock %}</title>
+    <meta name="description" content="{% block description %}TechTrack Solutions: gestión y trazabilidad de activos tecnológicos con SATE.{% endblock %}">
+    <link rel="canonical" href="{{ request.base_url }}">
+    <meta name="theme-color" content="#0b1220">
+
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+
+    <meta property="og:site_name" content="TechTrack Solutions">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_MX">
+    <meta property="og:title" content="{{ self.title()|striptags }}">
+    <meta property="og:description" content="{{ self.description()|striptags }}">
+    <meta property="og:url" content="{{ request.base_url }}">
+    <meta property="og:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ self.title()|striptags }}">
+    <meta name="twitter:description" content="{{ self.description()|striptags }}">
+    <meta name="twitter:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "TechTrack Solutions",
+      "url": "{{ request.url_root }}",
+      "logo": "{{ url_for('static', filename='favicon-32.png', _external=True) }}",
+      "description": "Empresa de tecnología dedicada a la gestión y trazabilidad de activos tecnológicos con SATE.",
+      "email": "contacto@techtrack.com",
+      "areaServed": "México"
+    }
+    </script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="navbar">
+        <div class="logo">
+            <a href="{{ url_for('inicio') }}" class="logo-link" aria-label="TechTrack Solutions, inicio">
+                <span class="logo-mark">TS</span>
+                <span class="logo-text">TechTrack Solutions</span>
+            </a>
+        </div>
+
+        <nav aria-label="Navegación principal">
+            <ul>
+                <li><a href="{{ url_for('inicio') }}" class="{% if request.endpoint == 'inicio' %}active{% endif %}">Inicio</a></li>
+                <li><a href="{{ url_for('empresa') }}" class="{% if request.endpoint == 'empresa' %}active{% endif %}">Empresa</a></li>
+                <li><a href="{{ url_for('departamentos') }}" class="{% if request.endpoint in ['departamentos', 'detalle_departamento'] %}active{% endif %}">Departamentos</a></li>
+                <li><a href="{{ url_for('politicas') }}" class="{% if request.endpoint in ['politicas', 'detalle_politica'] %}active{% endif %}">Políticas</a></li>
+                <li><a href="{{ url_for('trabaja_con_nosotros') }}" class="{% if request.endpoint in ['trabaja_con_nosotros', 'detalle_perfil'] %}active{% endif %}">Trabaja con nosotros</a></li>
+                <li><a href="{{ url_for('sate_info') }}" class="{% if request.endpoint == 'sate_info' %}active{% endif %}">Producto SATE</a></li>
+                <li><a href="{{ url_for('contacto') }}" class="{% if request.endpoint == 'contacto' %}active{% endif %}">Contacto</a></li>
+            </ul>
+        </nav>
+
+        <div class="auth-buttons">
+            {% if session.get('usuario_id') %}
+                <a href="{{ url_for('dashboard') }}" class="btn-primary">Ir al panel</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-primary">Acceder a SATE</a>
+            {% endif %}
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container flash-container">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <main class="container" id="contenido">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div>
+                <p class="footer-brand">TechTrack Solutions</p>
+                <p class="footer-copy">Control y trazabilidad de activos tecnológicos con SATE.</p>
+            </div>
+            <div>
+                <p class="footer-title">Navegación</p>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('empresa') }}">Empresa</a></li>
+                    <li><a href="{{ url_for('departamentos') }}">Departamentos</a></li>
+                    <li><a href="{{ url_for('politicas') }}">Políticas</a></li>
+                    <li><a href="{{ url_for('trabaja_con_nosotros') }}">Trabaja con nosotros</a></li>
+                    <li><a href="{{ url_for('cumplimiento_pia') }}">Cumplimiento del PIA</a></li>
+                </ul>
+            </div>
+            <div>
+                <p class="footer-title">Producto</p>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('sate_info') }}">SATE</a></li>
+                    <li><a href="{{ url_for('contacto') }}">Contacto</a></li>
+                    <li><a href="{{ url_for('privacidad') }}">Aviso de privacidad</a></li>
+                    <li><a href="{{ url_for('login') }}">Acceso al sistema</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TechTrack Solutions. Proyecto Integrador de Aprendizaje.</p>
+        </div>
+    </footer>
+</body>
+</html>

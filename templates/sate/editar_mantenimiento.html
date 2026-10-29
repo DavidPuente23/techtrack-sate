@@ -1,0 +1,29 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto; padding: 2rem;">
+    <h2>Cerrar / Editar Mantenimiento #{{ mantenimiento.id }}</h2>
+    
+    <form method="POST">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="estado">Estado del Mantenimiento:</label>
+            <select name="estado" id="estado" class="form-control" required>
+                <option value="Pendiente" {% if mantenimiento.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                <option value="En proceso" {% if mantenimiento.estado == 'En proceso' %}selected{% endif %}>En proceso</option>
+                <option value="Finalizado" {% if mantenimiento.estado == 'Finalizado' %}selected{% endif %}>Finalizado</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="observaciones">Observaciones / Trabajo Realizado:</label>
+            <textarea name="observaciones" id="observaciones" rows="4" class="form-control" style="width: 100%; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-light);">{{ mantenimiento.observaciones or '' }}</textarea>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn-primary">Guardar Cambios</button>
+            <a href="/app/mantenimientos" class="btn-secondary" style="padding: 0.8rem 1.5rem; border-radius: 4px; text-decoration: none; color: var(--text-primary); border: 1px solid var(--border-light);">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

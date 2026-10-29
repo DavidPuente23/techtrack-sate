@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SATE - {{ app_name }}{% endblock %}</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <noscript>
+        <style>
+            @media (max-width: 900px) {
+                .sidebar {
+                    position: static !important;
+                    transform: none !important;
+                    width: 100% !important;
+                    height: auto !important;
+                    max-height: none !important;
+                    box-shadow: none !important;
+                }
+                .menu-toggle, .sidebar-close, .sidebar-overlay { display: none !important; }
+                body.sidebar-open { overflow: auto; }
+            }
+        </style>
+    </noscript>
+</head>
+<body class="theme-{{ session.get('tema', 'blue') }}">
+    <a class="skip-link" href="#contenido-sate">Saltar al contenido de SATE</a>
+
+    <div class="sate-container">
+        <aside class="sidebar" id="sidebar-sate" aria-label="Navegación de SATE">
+            <div class="sidebar-brand">
+                <h2>SATE</h2>
+                <button type="button" class="sidebar-close" id="sidebar-close" aria-label="Cerrar menú de navegación">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <p class="sidebar-subtitle">Administración y trazabilidad de equipos</p>
+
+            <nav aria-label="Módulos de SATE">
+                <ul>
+                    {% for modulo in menu_modulos %}
+                    <li>
+                        <a href="{{ url_for(modulo.endpoint) }}"
+                           class="{% if request.endpoint in modulo.endpoints %}active{% endif %}"
+                           {% if request.endpoint in modulo.endpoints %}aria-current="page"{% endif %}>
+                            {{ modulo.nombre }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p class="sidebar-user">{{ session.get('nombre', '') }}</p>
+                <p class="sidebar-role">{{ session.get('rol', '') }}</p>
+                <a href="{{ url_for('inicio') }}" class="sidebar-link">← Volver al sitio público</a>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebar-overlay" hidden></div>
+
+        <main class="main-content" id="contenido-sate">
+            <header class="header-top">
+                <div class="header-heading">
+                    <button type="button" class="menu-toggle" id="menu-toggle"
+                            aria-controls="sidebar-sate" aria-expanded="false"
+                            aria-label="Abrir menú de navegación">
+                        <span aria-hidden="true">☰</span> Menú
+                    </button>
+                    <div>
+                        <h3>Sistema de Administración y Trazabilidad</h3>
+                        <p class="user-info">{{ session.get('nombre', '') }} · {{ session.get('rol', '') }}</p>
+                    </div>
+                </div>
+
+                <div class="header-actions">
+                    <form action="{{ url_for('cambiar_tema') }}" method="POST" class="theme-form">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                        <select name="tema" onchange="this.form.submit()" class="theme-select" aria-label="Tema visual">
+                            <option value="blue" {% if session.get('tema') == 'blue' %}selected{% endif %}>🔵 Azul</option>
+                            <option value="emerald" {% if session.get('tema') == 'emerald' %}selected{% endif %}>🟢 Esmeralda</option>
+                            <option value="fire" {% if session.get('tema') == 'fire' %}selected{% endif %}>🟠 Fuego</option>
+                            <option value="purple" {% if session.get('tema') == 'purple' %}selected{% endif %}>🟣 Amatista</option>
+                        </select>
+                    </form>
+
+                    <a href="{{ url_for('perfil') }}" class="btn-ghost">Mi Perfil</a>
+
+                    <form action="{{ url_for('logout') }}" method="POST" class="logout-form">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="btn-logout">Cerrar Sesión</button>
+                    </form>
+                </div>
+            </header>
+
+            {% if session.get('debe_cambiar_password') %}
+            <div class="flash flash-error">
+                Tu contraseña es temporal. Cámbiala desde <a href="{{ url_for('perfil') }}">Mi Perfil</a> para continuar.
+            </div>
+            {% endif %}
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/sate_nav.js') }}" defer></script>
+</body>
+</html>

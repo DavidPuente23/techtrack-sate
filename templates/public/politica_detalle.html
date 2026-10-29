@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ politica.nombre }} | Políticas de TechTrack Solutions{% endblock %}
+{% block description %}{{ politica.objetivo }}{% endblock %}
+
+{% block content %}
+<nav class="breadcrumbs" aria-label="Ruta de navegación">
+    <a href="{{ url_for('inicio') }}">Inicio</a>
+    <span aria-hidden="true">/</span>
+    <a href="{{ url_for('politicas') }}">Políticas</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{{ politica.nombre }}</span>
+</nav>
+
+<section class="page-hero page-hero--compact">
+    <p class="eyebrow">Política {{ "%02d"|format(politica.numero) }}</p>
+    <h1>{{ politica.nombre }}</h1>
+    <p class="page-lead">{{ politica.objetivo }}</p>
+
+    <div class="meta-row">
+        <span class="status-pill status-pill--info">
+            Responsable: {{ departamentos[politica.responsable].nombre }}
+        </span>
+        {% if politica.participantes %}
+        <span class="status-pill">
+            Participan:
+            {% for area in politica.participantes %}{{ departamentos[area].nombre }}{% if not loop.last %}, {% endif %}{% endfor %}
+        </span>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="policy-detail-grid">
+        <article class="detail-block">
+            <h2 class="section-title">Objetivo</h2>
+            <p>{{ politica.objetivo }}</p>
+        </article>
+
+        <article class="detail-block">
+            <h2 class="section-title">Alcance</h2>
+            <p>{{ politica.alcance }}</p>
+        </article>
+
+        <article class="detail-block">
+            <h2 class="section-title">Qué regula</h2>
+            <p>{{ politica.descripcion }}</p>
+        </article>
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="split-layout">
+        <div>
+            <h2 class="section-title">Reglas y lineamientos</h2>
+            <ul class="check-list">
+                {% for regla in politica.reglas %}
+                <li>{{ regla }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div>
+            <h2 class="section-title">Procedimiento general</h2>
+            <ol class="step-list">
+                {% for paso in politica.procedimiento %}
+                <li>{{ paso }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading-group">
+        <p class="eyebrow">Responsabilidades</p>
+        <h2 class="section-title">Quién hace qué</h2>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Área</th>
+                    <th>Participación</th>
+                    <th>Responsabilidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in politica.responsabilidades %}
+                <tr>
+                    <td>{{ areas[item.area].nombre }}</td>
+                    <td>{{ item.rol }}</td>
+                    <td>{{ item.accion }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="split-layout">
+        <div>
+            <p class="eyebrow">Relación con el producto</p>
+            <h2 class="section-title">Cómo se aplica en SATE</h2>
+            <p>{{ politica.relacion_sate }}</p>
+            <a href="{{ url_for('sate_info') }}" class="btn-primary">Conocer SATE</a>
+        </div>
+        <div class="info-card">
+            <h3>Origen del contenido</h3>
+            <p>
+                Esta política forma parte del PIA de TechTrack Solutions. Los apartados
+                de reglas, procedimiento y relación con SATE son una ampliación para el
+                sitio web y no se presentan como texto literal del documento original.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading-group">
+        <p class="eyebrow">Sigue explorando</p>
+        <h2 class="section-title">Otras políticas</h2>
+    </div>
+
+    <div class="inline-actions">
+        <a href="{{ url_for('politicas') }}" class="btn-secondary">← Volver a todas las políticas</a>
+        <a href="{{ url_for('detalle_departamento', slug=politica.responsable) }}" class="btn-secondary">
+            Ver área responsable: {{ departamentos[politica.responsable].nombre }}
+        </a>
+    </div>
+</section>
+{% endblock %}

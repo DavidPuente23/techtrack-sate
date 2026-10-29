@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Solicitud inválida - TechTrack Solutions{% endblock %}
+
+{% block content %}
+<section class="content-section error-page">
+    <h1 class="error-code">400</h1>
+    <h2>Solicitud inválida</h2>
+    <p class="error-text">
+        La solicitud no pudo procesarse. Es posible que el formulario haya expirado
+        o que falte el token de seguridad.
+    </p>
+    <p class="error-text">Recarga la página e inténtalo de nuevo.</p>
+    <a href="{{ url_for('inicio') }}" class="btn-primary">Volver al Inicio</a>
+</section>
+{% endblock %}

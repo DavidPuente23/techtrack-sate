@@ -1,0 +1,116 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+    <div class="page-header">
+        <div>
+            <h2>Mantenimiento #{{ mantenimiento.id }}</h2>
+            <p class="page-subtitle">
+                {{ mantenimiento.activo_nombre }} · {{ mantenimiento.tipo }}
+            </p>
+        </div>
+        <a href="{{ url_for('mantenimientos') }}" class="btn-secondary">← Volver a mantenimientos</a>
+    </div>
+
+    <div class="grid-container grid-container--two">
+        <div class="card">
+            <h3 class="card-title">Datos del servicio</h3>
+            <dl class="definition-list">
+                <div>
+                    <dt>Tipo</dt>
+                    <dd>{{ mantenimiento.tipo }}</dd>
+                </div>
+                <div>
+                    <dt>Estado</dt>
+                    <dd>
+                        <span class="{% if mantenimiento.estado == 'Finalizado' %}estado-operativo{% elif mantenimiento.estado == 'En proceso' %}estado-mantenimiento{% else %}estado-pendiente{% endif %}">
+                            {{ mantenimiento.estado }}
+                        </span>
+                    </dd>
+                </div>
+                <div>
+                    <dt>Fecha programada</dt>
+                    <dd>{{ mantenimiento.fecha_programada.strftime('%d/%m/%Y') }}</dd>
+                </div>
+                <div>
+                    <dt>Fecha de finalización</dt>
+                    <dd>
+                        {% if mantenimiento.fecha_finalizacion %}
+                            {{ mantenimiento.fecha_finalizacion.strftime('%d/%m/%Y %H:%M') }}
+                        {% else %}
+                            Pendiente
+                        {% endif %}
+                    </dd>
+                </div>
+                <div>
+                    <dt>Responsable</dt>
+                    <dd>{{ mantenimiento.responsable or '—' }}</dd>
+                </div>
+            </dl>
+
+            {% if puede(session.get('rol'), 'mantenimientos', 'editar') %}
+                <div class="card-actions">
+                    <a href="{{ url_for('editar_mantenimiento', id=mantenimiento.id) }}" class="btn-primary">Editar mantenimiento</a>
+                    <a href="{{ url_for('orden_mantenimiento_pdf', id=mantenimiento.id) }}" target="_blank" class="btn-secondary">Orden en PDF</a>
+                </div>
+            {% else %}
+                <div class="card-actions">
+                    <a href="{{ url_for('orden_mantenimiento_pdf', id=mantenimiento.id) }}" target="_blank" class="btn-secondary">Orden en PDF</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Equipo intervenido</h3>
+            <dl class="definition-list">
+                <div>
+                    <dt>Nombre</dt>
+                    <dd>{{ mantenimiento.activo_nombre }}</dd>
+                </div>
+                <div>
+                    <dt>Identificador</dt>
+                    <dd>{{ mantenimiento.activo_identificador or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Tipo</dt>
+                    <dd>{{ mantenimiento.activo_tipo or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Departamento</dt>
+                    <dd>{{ mantenimiento.departamento_nombre or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Ubicación</dt>
+                    <dd>{{ mantenimiento.activo_ubicacion or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Estado del equipo</dt>
+                    <dd>
+                        <span class="{% if mantenimiento.activo_estado == 'Operativo' %}estado-operativo{% elif mantenimiento.activo_estado == 'En Mantenimiento' %}estado-mantenimiento{% else %}estado-inactivo{% endif %}">
+                            {{ mantenimiento.activo_estado }}
+                        </span>
+                    </dd>
+                </div>
+            </dl>
+
+            {% if puede(session.get('rol'), 'activos', 'ver') %}
+                <div class="card-actions">
+                    <a href="{{ url_for('detalle_activo', id=mantenimiento.activo_id) }}" class="btn-secondary">Ver ficha del activo</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <section class="detail-section">
+        <h3 class="card-title">Descripción del trabajo</h3>
+        <p class="detail-text">{{ mantenimiento.descripcion or 'Sin descripción registrada.' }}</p>
+    </section>
+
+    <section class="detail-section">
+        <h3 class="card-title">Observaciones</h3>
+        {% if mantenimiento.observaciones %}
+            <p class="detail-text">{{ mantenimiento.observaciones }}</p>
+        {% else %}
+            <p class="detail-text detail-text--muted">Todavía no hay observaciones de cierre.</p>
+        {% endif %}
+    </section>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Acceso denegado - TechTrack Solutions{% endblock %}
+
+{% block content %}
+<section class="content-section error-page">
+    <h1 class="error-code">403</h1>
+    <h2>Acceso denegado</h2>
+    <p class="error-text">
+        No tienes permisos para acceder a esta sección del sistema.
+    </p>
+    <p class="error-text">
+        Si crees que es un error, contacta al administrador del sistema.
+    </p>
+    <div class="error-actions">
+        <a href="{{ url_for('inicio') }}" class="btn-primary">Volver al Inicio</a>
+        {% if session.get('usuario_id') %}
+            <a href="{{ url_for('dashboard') }}" class="btn-secondary">Ir al Panel</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="btn-secondary">Iniciar Sesión</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

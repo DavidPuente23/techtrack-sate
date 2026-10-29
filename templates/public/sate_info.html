@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}SATE | Sistema de Administración y Trazabilidad de Equipos{% endblock %}
+{% block description %}SATE es la plataforma de TechTrack Solutions para administrar activos tecnológicos, mantenimientos e incidencias con historial y trazabilidad.{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero--home">
+    <p class="eyebrow">Producto principal</p>
+    <h1>SATE</h1>
+    <p class="page-lead">
+        {{ sate.significado }}. Una plataforma web para registrar, controlar y monitorear
+        los equipos de una organización, con historial completo y alertas para actuar
+        antes de que las fallas ocurran.
+    </p>
+    <div class="hero-actions">
+        <a href="#funcionalidades" class="btn-primary">Conocer funcionalidades</a>
+        <a href="{{ url_for('login') }}" class="btn-secondary">Acceder a SATE</a>
+        <a href="{{ url_for('contacto') }}" class="btn-ghost">Contactar</a>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="split-layout">
+        <div>
+            <p class="eyebrow">El problema que resuelve</p>
+            <h2 class="section-title">De la información dispersa al control centralizado</h2>
+            <p>{{ sate.problema }}</p>
+        </div>
+        <div class="info-card">
+            <h3>¿Quiénes pueden utilizarlo?</h3>
+            <ul class="check-list">
+                <li>Dirección General, para consultar indicadores y tomar decisiones.</li>
+                <li>SIT, para administrar el inventario y los mantenimientos.</li>
+                <li>Redes y Desarrollo, para atender incidentes de su ámbito.</li>
+                <li>Soporte, para registrar, diagnosticar y cerrar casos.</li>
+                <li>Usuarios solicitantes, para reportar fallas y consultar sus casos.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="section-block section-block--panel" id="funcionalidades">
+    <div class="section-heading-group">
+        <p class="eyebrow">Funcionalidades</p>
+        <h2 class="section-title">Cómo funciona SATE</h2>
+        <p class="section-subtitle">
+            Cinco módulos que cubren el ciclo de vida del activo y la atención de los
+            servicios tecnológicos.
+        </p>
+    </div>
+
+    <div class="grid-container">
+        {% for modulo in sate.modulos %}
+        <article class="card feature-card">
+            <span class="feature-icon" aria-hidden="true">{{ "%02d"|format(loop.index) }}</span>
+            <h3>{{ modulo.nombre }}</h3>
+            <p>{{ modulo.descripcion }}</p>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading-group">
+        <p class="eyebrow">El flujo</p>
+        <h2 class="section-title">Del alta del equipo al cierre de la incidencia</h2>
+    </div>
+
+    <div class="timeline">
+        <div class="timeline-step">
+            <span class="timeline-number">1</span>
+            <div>
+                <h3>Se registra el activo</h3>
+                <p>Se capturan sus datos, se le asigna un identificador único y un responsable.</p>
+            </div>
+        </div>
+        <div class="timeline-step">
+            <span class="timeline-number">2</span>
+            <div>
+                <h3>Se programan mantenimientos</h3>
+                <p>El sistema muestra fechas próximas y vencidas para actuar a tiempo.</p>
+            </div>
+        </div>
+        <div class="timeline-step">
+            <span class="timeline-number">3</span>
+            <div>
+                <h3>Se reportan incidencias</h3>
+                <p>Cada caso tiene prioridad, responsable, diagnóstico y solución.</p>
+            </div>
+        </div>
+        <div class="timeline-step">
+            <span class="timeline-number">4</span>
+            <div>
+                <h3>Se conserva el historial</h3>
+                <p>Cambios, mantenimientos e incidencias quedan en la trazabilidad del equipo.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="section-heading-group">
+        <p class="eyebrow">Beneficios</p>
+        <h2 class="section-title">Qué cambia para la organización</h2>
+    </div>
+
+    <div class="grid-container">
+        {% for beneficio in sate.beneficios %}
+        <article class="card benefit-card">
+            <span class="check-mark" aria-hidden="true">✓</span>
+            <p>{{ beneficio }}</p>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading-group">
+        <p class="eyebrow">Vista del producto</p>
+        <h2 class="section-title">Así se ve el panel principal</h2>
+        <p class="section-subtitle">
+            Las siguientes imágenes son bocetos de la interfaz. Se sustituirán por capturas
+            reales del sistema cuando la versión de demostración esté completa.
+        </p>
+    </div>
+
+    <div class="screenshot-grid">
+        <figure class="screenshot-frame">
+            <div class="screenshot-bar">
+                <span></span><span></span><span></span>
+                <span class="screenshot-url">SATE · Panel principal</span>
+            </div>
+            <div class="screenshot-body">
+                <div class="mock-kpi-row">
+                    <div class="mock-kpi"><span>Activos</span><strong>128</strong></div>
+                    <div class="mock-kpi"><span>Operativos</span><strong>104</strong></div>
+                    <div class="mock-kpi"><span>Mantenimientos</span><strong>7</strong></div>
+                    <div class="mock-kpi"><span>Incidencias</span><strong>12</strong></div>
+                </div>
+                <div class="mock-table">
+                    <div class="mock-line mock-line--header"></div>
+                    <div class="mock-line"></div>
+                    <div class="mock-line"></div>
+                    <div class="mock-line"></div>
+                </div>
+            </div>
+            <figcaption>Boceto del panel: indicadores y pendientes.</figcaption>
+        </figure>
+
+        <figure class="screenshot-frame">
+            <div class="screenshot-bar">
+                <span></span><span></span><span></span>
+                <span class="screenshot-url">SATE · Activos e historial</span>
+            </div>
+            <div class="screenshot-body">
+                <div class="mock-detail">
+                    <div class="mock-avatar"></div>
+                    <div class="mock-detail-lines">
+                        <div class="mock-line mock-line--title"></div>
+                        <div class="mock-line"></div>
+                        <div class="mock-line mock-line--short"></div>
+                    </div>
+                </div>
+                <div class="mock-timeline">
+                    <div class="mock-timeline-item"></div>
+                    <div class="mock-timeline-item"></div>
+                    <div class="mock-timeline-item"></div>
+                </div>
+            </div>
+            <figcaption>Boceto de la ficha del activo y su historial.</figcaption>
+        </figure>
+    </div>
+</section>
+
+<section class="cta-band">
+    <div>
+        <h2>¿Quieres ver SATE con datos reales?</h2>
+        <p>Accede al sistema o solicita una demostración para tu organización.</p>
+    </div>
+    <div class="cta-actions">
+        <a href="{{ url_for('login') }}" class="btn-primary">Acceder a SATE</a>
+        <a href="{{ url_for('contacto') }}" class="btn-secondary">Solicitar demostración</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block title %}Mi Perfil - SATE{% endblock %}
+
+{% block content %}
+    <div class="content-section">
+        <h2>Mi Perfil</h2>
+        <p class="text-muted">Gestiona tu información de acceso y personaliza tu entorno.</p>
+
+        <div class="form-container">
+            <h3 class="section-title">Datos de la Cuenta</h3>
+            <dl class="definition-list">
+                <dt>Nombre</dt>
+                <dd>{{ usuario.nombre }}</dd>
+                <dt>Correo electrónico</dt>
+                <dd>{{ usuario.email }}</dd>
+                <dt>Departamento</dt>
+                <dd>{{ usuario.departamento or 'Sin departamento' }}</dd>
+                <dt>Rol en SATE</dt>
+                <dd>{{ usuario.rol or 'Sin rol' }}</dd>
+            </dl>
+
+            {% if usuario.debe_cambiar_password %}
+            <p class="notice-inline">
+                Tu contraseña es temporal. Debes cambiarla aquí para poder usar el resto de SATE.
+            </p>
+            {% endif %}
+
+            <hr class="divider">
+
+            <h3 class="section-title">Personalización y Seguridad</h3>
+            <form method="POST" action="{{ url_for('perfil') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+                <label for="tema">Tema Visual de SATE:</label>
+                <select id="tema" name="tema">
+                    <option value="blue" {% if usuario.tema == 'blue' %}selected{% endif %}>Azul Neón (Por defecto)</option>
+                    <option value="emerald" {% if usuario.tema == 'emerald' %}selected{% endif %}>Esmeralda (Verde)</option>
+                    <option value="fire" {% if usuario.tema == 'fire' %}selected{% endif %}>Fuego (Naranja)</option>
+                    <option value="purple" {% if usuario.tema == 'purple' %}selected{% endif %}>Amatista (Morado)</option>
+                </select>
+
+                <label for="password_actual">Contraseña Actual (solo si vas a cambiarla):</label>
+                <input type="password" id="password_actual" name="password_actual" autocomplete="current-password" placeholder="Escribe tu contraseña actual">
+
+                <label for="password">Nueva Contraseña (déjala en blanco si no quieres cambiarla):</label>
+                <input type="password" id="password" name="password" minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+
+                <button type="submit" class="btn-primary btn-block">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

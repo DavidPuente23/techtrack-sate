@@ -1,0 +1,47 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+    <h2>Registrar Nuevo Activo</h2>
+    
+    <div class="form-container">
+        <form method="POST" action="/app/activos/nuevo">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <label>Nombre del Equipo (Ej. Laptop Dell Desarrollo):</label>
+            <input type="text" name="nombre" required>
+            
+            <label>Tipo de Activo:</label>
+            <select name="tipo" required>
+                <option value="Laptop">Laptop</option>
+                <option value="Computadora de Escritorio">Computadora de Escritorio</option>
+                <option value="Monitor">Monitor</option>
+                <option value="Servidor">Servidor</option>
+                <option value="Impresora">Impresora</option>
+                <option value="Otro">Otro</option>
+            </select>
+            
+            <label>Marca:</label>
+            <input type="text" name="marca">
+            
+            <label>Modelo:</label>
+            <input type="text" name="modelo">
+            
+            <label>Número de Serie:</label>
+            <input type="text" name="numero_serie">
+            
+            <label>Ubicación (Ej. Oficina 2, Piso 4):</label>
+            <input type="text" name="ubicacion">
+            
+            <label>Nombre del Responsable Asignado:</label>
+            <input type="text" name="responsable" required>
+            
+            <label>Departamento Asignado:</label>
+            <select name="departamento_id" required>
+                {% for depto in departamentos %}
+                    <option value="{{ depto.id }}">{{ depto.nombre }}</option>
+                {% endfor %}
+            </select>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem; padding: 1rem; border: none; cursor: pointer;">Guardar Activo</button>
+        </form>
+    </div>
+{% endblock %}

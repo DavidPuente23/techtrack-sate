@@ -1,0 +1,39 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block title %}Editar Activo - SATE{% endblock %}
+
+{% block content %}
+    <h2>Editar Activo #{{ activo.id }}</h2>
+
+    <div class="form-container">
+        <form method="POST" action="{{ url_for('editar_activo', id=activo.id) }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+            <label for="nombre">Nombre del Equipo:</label>
+            <input type="text" id="nombre" name="nombre" value="{{ activo.nombre }}" required>
+
+            <label for="ubicacion">Ubicación:</label>
+            <input type="text" id="ubicacion" name="ubicacion" value="{{ activo.ubicacion or '' }}">
+
+            <label for="responsable">Responsable Asignado:</label>
+            <input type="text" id="responsable" name="responsable" value="{{ activo.responsable or '' }}" required>
+
+            <label for="departamento_id">Departamento:</label>
+            <select id="departamento_id" name="departamento_id" required>
+                {% for depto in departamentos %}
+                    <option value="{{ depto.id }}" {% if activo.departamento_id == depto.id %}selected{% endif %}>{{ depto.nombre }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="estado">Estado del Equipo:</label>
+            <select id="estado" name="estado" required>
+                {% for estado in ['Operativo', 'En Mantenimiento', 'Con Falla', 'Baja'] %}
+                    <option value="{{ estado }}" {% if activo.estado == estado %}selected{% endif %}>{{ estado }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn-primary btn-block">Actualizar Activo</button>
+            <a href="{{ url_for('activos') }}" class="btn-secondary btn-block">Cancelar</a>
+        </form>
+    </div>
+{% endblock %}

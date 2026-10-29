@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Aviso de privacidad | TechTrack Solutions{% endblock %}
+{% block description %}Aviso de privacidad de TechTrack Solutions sobre el tratamiento de datos personales en formularios de contacto y postulación.{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero--compact">
+    <p class="eyebrow">Legal</p>
+    <h1>Aviso de privacidad</h1>
+    <p class="page-lead">
+        En TechTrack Solutions nos tomamos en serio la protección de los datos personales
+        que recibimos a través de nuestros formularios.
+    </p>
+</section>
+
+<section class="section-block">
+    <div class="content-prose">
+        <h2 class="section-title">Uso de la información</h2>
+        <p>
+            La información recabada a través de los formularios de contacto y postulación
+            será utilizada única y exclusivamente para:
+        </p>
+        <ul class="check-list">
+            <li>Responder a solicitudes de información sobre la plataforma SATE.</li>
+            <li>Agendar demostraciones del producto.</li>
+            <li>Evaluar perfiles profesionales para las vacantes de ejemplo del proyecto.</li>
+        </ul>
+
+        <h2 class="section-title">Protección de los datos</h2>
+        <p>
+            Sus datos no serán compartidos con terceros sin consentimiento explícito, en
+            cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión
+            de los Particulares.
+        </p>
+
+        <h2 class="section-title">Contacto</h2>
+        <p>
+            Si tiene dudas sobre el tratamiento de sus datos, puede escribir a
+            <strong>contacto@techtrack.com</strong> o utilizar el
+            <a href="{{ url_for('contacto') }}">formulario de contacto</a>.
+        </p>
+
+        <p class="notice-inline">
+            Este aviso forma parte de un proyecto escolar. Los datos capturados se utilizan
+            únicamente para demostrar el funcionamiento del sistema.
+        </p>
+    </div>
+</section>
+{% endblock %}

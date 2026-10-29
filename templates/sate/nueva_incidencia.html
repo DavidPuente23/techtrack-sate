@@ -1,0 +1,35 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+    <h2>Reportar Nueva Incidencia</h2>
+    
+    <div class="form-container">
+        <form method="POST" action="/app/incidencias/nueva">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <label>Equipo que presenta la falla:</label>
+            <select name="activo_id" required>
+                <option value="" disabled selected>-- Selecciona el equipo --</option>
+                {% for activo in activos %}
+                    <option value="{{ activo.id }}">{{ activo.nombre }}</option>
+                {% endfor %}
+            </select>
+            
+            <label>Descripción detallada del problema:</label>
+            <textarea name="descripcion" rows="4" required style="width: 100%; padding: 0.8rem; margin-top: 0.5rem; margin-bottom: 1.5rem; background-color: #121212; border: 1px solid var(--border-color); color: white; border-radius: 5px; box-sizing: border-box;" placeholder="Ej. La pantalla parpadea y el equipo se apaga a los 10 minutos..."></textarea>
+            
+            <label>Prioridad:</label>
+            <select name="prioridad" required>
+                <option value="Baja">Baja (No afecta el trabajo diario)</option>
+                <option value="Media" selected>Media (Molestia, pero permite trabajar)</option>
+                <option value="Alta">Alta (Impide trabajar a un usuario)</option>
+                <option value="Crítica">Crítica (Afecta a todo un departamento o sistema)</option>
+            </select>
+            
+            <label>Técnico o Área Asignada:</label>
+            <input type="text" name="responsable" placeholder="Ej. Soporte Nivel 1" required>
+            
+            <button type="submit" class="btn-primary" style="background-color: #dc3545; width: 100%; margin-top: 1rem; padding: 1rem; border: none; cursor: pointer;">Crear Ticket de Soporte</button>
+            <a href="/app/incidencias" style="display: block; text-align: center; margin-top: 1rem; color: var(--text-secondary); text-decoration: none;">Cancelar</a>
+        </form>
+    </div>
+{% endblock %}

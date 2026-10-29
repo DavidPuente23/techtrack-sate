@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Contacto | TechTrack Solutions{% endblock %}
+{% block description %}Contacta a TechTrack Solutions para conocer SATE, solicitar una demostración o resolver dudas sobre la plataforma.{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero--compact">
+    <p class="eyebrow">Hablemos</p>
+    <h1>Contacto</h1>
+    <p class="page-lead">
+        ¿Tienes dudas sobre SATE o te gustaría agendar una demostración? Déjanos tus
+        datos y te contactaremos.
+    </p>
+</section>
+
+<section class="section-block">
+    <div class="contact-layout">
+        <div class="card form-card">
+            <h2 class="section-title">Envíanos un mensaje</h2>
+            <form method="POST" action="{{ url_for('contacto') }}" class="stacked-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+                <div>
+                    <label for="nombre">Nombre completo:</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej. Juan Pérez" required>
+                </div>
+
+                <div>
+                    <label for="organizacion">Empresa u organización:</label>
+                    <input type="text" id="organizacion" name="organizacion" placeholder="Ej. Universidad Autónoma" required>
+                </div>
+
+                <div>
+                    <label for="correo">Correo electrónico:</label>
+                    <input type="email" id="correo" name="correo" placeholder="juan@empresa.com" required>
+                </div>
+
+                <div>
+                    <label for="telefono">Teléfono (opcional):</label>
+                    <input type="text" id="telefono" name="telefono" placeholder="10 dígitos">
+                </div>
+
+                <div>
+                    <label for="motivo">Motivo de contacto:</label>
+                    <select id="motivo" name="motivo" required>
+                        <option value="Información sobre SATE">Información sobre SATE</option>
+                        <option value="Solicitar demostración">Solicitar demostración</option>
+                        <option value="Soporte técnico">Soporte técnico</option>
+                        <option value="Colaboración o proyecto">Colaboración o proyecto</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="mensaje">Mensaje:</label>
+                    <textarea id="mensaje" name="mensaje" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                </div>
+
+                <div class="checkbox-row">
+                    <input type="checkbox" id="privacidad" name="acepta_privacidad" value="1" required>
+                    <label for="privacidad">Acepto el <a href="{{ url_for('privacidad') }}">Aviso de Privacidad</a></label>
+                </div>
+
+                <button type="submit" class="btn-primary">Enviar mensaje</button>
+            </form>
+        </div>
+
+        <aside class="contact-info">
+            <div class="info-card">
+                <h3>Información de contacto</h3>
+                <dl class="definition-list">
+                    <dt>Correo</dt>
+                    <dd>contacto@techtrack.com</dd>
+                    <dt>Horario</dt>
+                    <dd>Lunes a viernes, 9:00 a 18:00</dd>
+                    <dt>Producto</dt>
+                    <dd>SATE — Sistema de Administración y Trazabilidad de Equipos</dd>
+                </dl>
+            </div>
+
+            <div class="info-card">
+                <h3>¿Ya eres usuario?</h3>
+                <p>Si tu cuenta ya fue creada por un administrador, puedes entrar directamente al sistema.</p>
+                <a href="{{ url_for('login') }}" class="btn-secondary">Acceder a SATE</a>
+            </div>
+        </aside>
+    </div>
+</section>
+{% endblock %}

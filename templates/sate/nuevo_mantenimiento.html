@@ -1,0 +1,36 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+    <h2>Programar Mantenimiento</h2>
+    
+    <div class="form-container">
+        <form method="POST" action="/app/mantenimientos/nuevo">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <label>Seleccionar Equipo:</label>
+            <select name="activo_id" required>
+                <option value="" disabled selected>-- Elige un activo --</option>
+                {% for activo in activos %}
+                    <option value="{{ activo.id }}">{{ activo.nombre }} ({{ activo.marca }} {{ activo.modelo }})</option>
+                {% endfor %}
+            </select>
+            
+            <label>Tipo de Mantenimiento:</label>
+            <select name="tipo" required>
+                <option value="Preventivo">Preventivo (Revisión/Limpieza)</option>
+                <option value="Correctivo">Correctivo (Reparación)</option>
+            </select>
+            
+            <label>Descripción del Trabajo a Realizar:</label>
+            <input type="text" name="descripcion" placeholder="Ej. Limpieza interna y cambio de pasta térmica" required>
+            
+            <label>Fecha Programada:</label>
+            <input type="date" name="fecha_programada" required style="background-color: #121212; color: white; border: 1px solid var(--border-color); padding: 0.8rem; width: 100%; border-radius: 5px; margin-top: 0.5rem; margin-bottom: 1.5rem; box-sizing: border-box;">
+            
+            <label>Técnico Responsable:</label>
+            <input type="text" name="responsable" placeholder="Nombre del técnico" required>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem; padding: 1rem; border: none; cursor: pointer;">Guardar Programación</button>
+            <a href="/app/mantenimientos" style="display: block; text-align: center; margin-top: 1rem; color: var(--text-secondary); text-decoration: none;">Cancelar</a>
+        </form>
+    </div>
+{% endblock %}

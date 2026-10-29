@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Políticas de gestión de TI | TechTrack Solutions{% endblock %}
+{% block description %}Las diez políticas de gestión de TI de TechTrack Solutions, con su objetivo, área responsable y áreas participantes.{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <p class="eyebrow">Marco de gestión</p>
+    <h1>Políticas de gestión de TI</h1>
+    <p class="page-lead">
+        Diez políticas que rigen la operación de TechTrack Solutions y el uso de SATE.
+        Cada una tiene un área responsable y puede involucrar a otras áreas como
+        participantes.
+    </p>
+</section>
+
+<section class="section-block">
+    <div class="section-heading-group">
+        <p class="eyebrow">Matriz de responsabilidad</p>
+        <h2 class="section-title">Quién lidera y quién participa</h2>
+        <p class="section-subtitle">
+            <strong>R</strong> = responsable principal · <strong>P</strong> = participa ·
+            <strong>—</strong> = no aplica directamente.
+        </p>
+    </div>
+
+    <div class="table-container">
+        <table class="matrix-table">
+            <thead>
+                <tr>
+                    <th>N.º</th>
+                    <th>Política</th>
+                    {% for slug, departamento in departamentos.items() %}
+                    <th>{{ departamento.nombre }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for fila in matriz %}
+                <tr>
+                    <td>{{ fila.politica.numero }}</td>
+                    <td><a href="{{ url_for('detalle_politica', slug=fila.politica.slug) }}">{{ fila.politica.nombre }}</a></td>
+                    {% for slug, departamento in departamentos.items() %}
+                    {% set valor = fila.participacion[slug] %}
+                    <td class="matrix-cell matrix-{{ 'r' if valor == 'R' else 'p' if valor == 'P' else 'none' }}">{{ valor }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="section-heading-group">
+        <p class="eyebrow">Las diez políticas</p>
+        <h2 class="section-title">Consulta cada política</h2>
+    </div>
+
+    <div class="grid-container">
+        {% for slug, politica in politicas.items() %}
+        <article class="card policy-card">
+            <div class="card-header">
+                <span class="policy-number">{{ "%02d"|format(politica.numero) }}</span>
+                <span class="status-pill status-pill--info">{{ departamentos[politica.responsable].nombre }}</span>
+            </div>
+            <h3>{{ politica.nombre }}</h3>
+            <p>{{ politica.objetivo }}</p>
+            <p class="card-meta">
+                <strong>Responsable:</strong> {{ departamentos[politica.responsable].nombre }}
+                {% if politica.participantes %}
+                <br><strong>Participan:</strong>
+                {% for area in politica.participantes %}{{ departamentos[area].nombre }}{% if not loop.last %}, {% endif %}{% endfor %}
+                {% endif %}
+            </p>
+            <a href="{{ url_for('detalle_politica', slug=slug) }}" class="btn-secondary">Ver política completa</a>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="split-layout">
+        <div>
+            <p class="eyebrow">Del documento a la operación</p>
+            <h2 class="section-title">Las políticas también explican SATE</h2>
+            <p>
+                Cada ficha indica cómo se relaciona la política con el sistema: qué módulo
+                la apoya, qué información se registra y qué queda para una fase posterior.
+                Así se entiende que SATE no es solo un inventario, sino parte de un modelo
+                de gestión.
+            </p>
+        </div>
+        <div class="info-card">
+            <h3>Nota sobre el contenido</h3>
+            <p>
+                Las políticas y su asignación por área provienen del PIA. Los apartados de
+                reglas, procedimiento y relación con SATE se desarrollaron para el sitio
+                web y se identifican como contenido ampliado.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

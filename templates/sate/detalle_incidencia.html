@@ -1,0 +1,133 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+    <div class="page-header">
+        <div>
+            <h2>Incidencia #{{ incidencia.id }}</h2>
+            <p class="page-subtitle">
+                {{ incidencia.activo_nombre }} · {{ incidencia.prioridad }}
+            </p>
+        </div>
+        <a href="{{ url_for('incidencias') }}" class="btn-secondary">← Volver a incidencias</a>
+    </div>
+
+    <div class="grid-container grid-container--two">
+        <div class="card">
+            <h3 class="card-title">Reporte</h3>
+            <dl class="definition-list">
+                <div>
+                    <dt>Estado</dt>
+                    <dd>{{ incidencia.estado }}</dd>
+                </div>
+                <div>
+                    <dt>Prioridad</dt>
+                    <dd>
+                        <span class="{% if incidencia.prioridad == 'Alta' or incidencia.prioridad == 'Crítica' %}prioridad-alta{% elif incidencia.prioridad == 'Media' %}prioridad-media{% else %}prioridad-baja{% endif %}">
+                            {{ incidencia.prioridad }}
+                        </span>
+                    </dd>
+                </div>
+                <div>
+                    <dt>Fecha de registro</dt>
+                    <dd>{{ incidencia.fecha_registro.strftime('%d/%m/%Y %H:%M') }}</dd>
+                </div>
+                <div>
+                    <dt>Fecha de cierre</dt>
+                    <dd>
+                        {% if incidencia.fecha_cierre %}
+                            {{ incidencia.fecha_cierre.strftime('%d/%m/%Y %H:%M') }}
+                        {% elif incidencia.estado in ('Resuelta', 'Cerrada') %}
+                            Sin fecha registrada
+                        {% else %}
+                            Abierta
+                        {% endif %}
+                    </dd>
+                </div>
+                <div>
+                    <dt>Solicitante</dt>
+                    <dd>
+                        {% if incidencia.solicitante_nombre %}
+                            {{ incidencia.solicitante_nombre }}
+                            <span class="cell-subtitle">{{ incidencia.solicitante_email }}</span>
+                        {% else %}
+                            Usuario eliminado
+                        {% endif %}
+                    </dd>
+                </div>
+                <div>
+                    <dt>Asignado a</dt>
+                    <dd>{{ incidencia.responsable or '—' }}</dd>
+                </div>
+            </dl>
+
+            {% if puede(session.get('rol'), 'incidencias', 'editar') %}
+                <div class="card-actions">
+                    <a href="{{ url_for('editar_incidencia', id=incidencia.id) }}" class="btn-primary">Atender incidencia</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Equipo afectado</h3>
+            <dl class="definition-list">
+                <div>
+                    <dt>Nombre</dt>
+                    <dd>{{ incidencia.activo_nombre }}</dd>
+                </div>
+                <div>
+                    <dt>Identificador</dt>
+                    <dd>{{ incidencia.activo_identificador or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Tipo</dt>
+                    <dd>{{ incidencia.activo_tipo or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Departamento</dt>
+                    <dd>{{ incidencia.departamento_nombre or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Ubicación</dt>
+                    <dd>{{ incidencia.activo_ubicacion or '—' }}</dd>
+                </div>
+                <div>
+                    <dt>Estado del equipo</dt>
+                    <dd>
+                        <span class="{% if incidencia.activo_estado == 'Operativo' %}estado-operativo{% elif incidencia.activo_estado == 'En Mantenimiento' %}estado-mantenimiento{% else %}estado-inactivo{% endif %}">
+                            {{ incidencia.activo_estado }}
+                        </span>
+                    </dd>
+                </div>
+            </dl>
+
+            {% if puede(session.get('rol'), 'activos', 'ver') %}
+                <div class="card-actions">
+                    <a href="{{ url_for('detalle_activo', id=incidencia.activo_id) }}" class="btn-secondary">Ver ficha del activo</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <section class="detail-section">
+        <h3 class="card-title">Descripción de la falla</h3>
+        <p class="detail-text">{{ incidencia.descripcion or 'Sin descripción registrada.' }}</p>
+    </section>
+
+    <section class="detail-section">
+        <h3 class="card-title">Diagnóstico</h3>
+        {% if incidencia.diagnostico %}
+            <p class="detail-text">{{ incidencia.diagnostico }}</p>
+        {% else %}
+            <p class="detail-text detail-text--muted">Pendiente de diagnóstico.</p>
+        {% endif %}
+    </section>
+
+    <section class="detail-section">
+        <h3 class="card-title">Resolución</h3>
+        {% if incidencia.resolucion %}
+            <p class="detail-text">{{ incidencia.resolucion }}</p>
+        {% else %}
+            <p class="detail-text detail-text--muted">La incidencia aún no tiene resolución registrada.</p>
+        {% endif %}
+    </section>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Trabaja con nosotros | TechTrack Solutions{% endblock %}
+{% block description %}Perfiles profesionales de TechTrack Solutions: Administrador de Activos, Administrador de Redes, Desarrollador SATE y Técnico de Soporte.{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <p class="eyebrow">Talento y estructura</p>
+    <h1>Trabaja con nosotros</h1>
+    <p class="page-lead">
+        Estos son los perfiles profesionales que componen TechTrack Solutions. Cada uno
+        pertenece a un departamento y tiene funciones, requisitos y herramientas definidos
+        en el PIA.
+    </p>
+    <p class="notice-inline">
+        Los perfiles se presentan como vacantes de ejemplo dentro de un proyecto escolar.
+        No corresponden a una convocatoria laboral real.
+    </p>
+</section>
+
+<section class="section-block">
+    <div class="grid-container">
+        {% for slug, perfil in perfiles.items() %}
+        <article class="card profile-card">
+            <div class="card-header">
+                <span class="department-badge">{{ departamentos[perfil.departamento].nombre }}</span>
+                <span class="status-pill">Tiempo completo</span>
+            </div>
+            <h3>{{ perfil.nombre }}</h3>
+            <p>{{ perfil.resumen }}</p>
+            <p class="card-meta"><strong>Reporta a:</strong> {{ perfil.reporta_a }}</p>
+            <p class="card-meta"><strong>Requisitos:</strong> {{ perfil.requisitos_resumen }}</p>
+            <a href="{{ url_for('detalle_perfil', slug=slug) }}" class="btn-primary">Ver perfil completo</a>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="split-layout">
+        <div>
+            <p class="eyebrow">Cómo se relaciona con el PIA</p>
+            <h2 class="section-title">Un perfil por departamento</h2>
+            <p>
+                Los cuatro perfiles corresponden a los departamentos de SIT, Redes,
+                Desarrollo y Soporte. Cada ficha incluye objetivo, funciones, escolaridad,
+                experiencia, conocimientos, competencias y herramientas.
+            </p>
+        </div>
+        <div class="info-card">
+            <h3>¿Buscas el detalle de un área?</h3>
+            <p>
+                Cada departamento tiene su propia página con funciones, políticas
+                asignadas y el perfil de puesto correspondiente.
+            </p>
+            <a href="{{ url_for('departamentos') }}" class="btn-secondary">Ver departamentos</a>
+        </div>
+    </div>
+</section>
+
+<section class="cta-band">
+    <div>
+        <h2>¿Te interesa colaborar con TechTrack Solutions?</h2>
+        <p>Envía tu solicitud desde el perfil que mejor se ajuste a tu experiencia.</p>
+    </div>
+    <div class="cta-actions">
+        <a href="{{ url_for('contacto') }}" class="btn-primary">Contactar a la empresa</a>
+        <a href="{{ url_for('sate_info') }}" class="btn-secondary">Conocer SATE</a>
+    </div>
+</section>
+{% endblock %}

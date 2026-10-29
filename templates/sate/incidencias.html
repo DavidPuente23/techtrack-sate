@@ -1,0 +1,110 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block content %}
+    <div class="page-header">
+        <div>
+            <h2>{% if session.get('rol') == rol_usuario %}Mis incidencias{% else %}Gestión de Incidencias{% endif %}</h2>
+            <p class="page-subtitle">
+                {% if session.get('rol') == rol_usuario %}
+                    Aquí puedes consultar las fallas que has reportado.
+                {% else %}
+                    Registra, filtra y resuelve las fallas reportadas sobre los equipos.
+                {% endif %}
+            </p>
+        </div>
+        {% if puede(session.get('rol'), 'incidencias', 'crear') %}
+            <a href="{{ url_for('nueva_incidencia') }}" class="btn-primary" style="background-color: #dc3545;">+ Reportar Falla</a>
+        {% endif %}
+    </div>
+
+    <form method="GET" action="{{ url_for('incidencias') }}" class="filter-bar" role="search">
+        <div class="filter-field filter-field--grow">
+            <label for="q">Buscar</label>
+            <input type="search" id="q" name="q" value="{{ filtros.q }}"
+                   placeholder="Descripción, equipo, identificador o asignado" maxlength="100">
+        </div>
+
+        <div class="filter-field">
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado">
+                <option value="">Todos</option>
+                {% for valor in estados %}
+                    <option value="{{ valor }}" {% if filtros.estado == valor %}selected{% endif %}>{{ valor }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-field">
+            <label for="prioridad">Prioridad</label>
+            <select id="prioridad" name="prioridad">
+                <option value="">Todas</option>
+                {% for valor in prioridades %}
+                    <option value="{{ valor }}" {% if filtros.prioridad == valor %}selected{% endif %}>{{ valor }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn-primary">Filtrar</button>
+            <a href="{{ url_for('incidencias') }}" class="btn-secondary">Limpiar</a>
+        </div>
+    </form>
+
+    <div class="filter-summary">
+        <span>{{ incidencias|length }} incidencia(s) encontrada(s)</span>
+        {% if filtros.q or filtros.estado or filtros.prioridad %}
+            <span class="filter-chip">Filtros aplicados</span>
+        {% endif %}
+    </div>
+
+    <div class="table-container">
+        <table class="table-compact">
+            <thead>
+                <tr>
+                    <th>Ticket</th>
+                    <th>Equipo Afectado</th>
+                    <th>Falla Reportada</th>
+                    <th>Prioridad</th>
+                    <th>Estado</th>
+                    <th>Solicitante</th>
+                    <th>Asignado a</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inc in incidencias %}
+                <tr>
+                    <td class="cell-id">#{{ inc.id }}</td>
+                    <td>
+                        <span class="cell-title">{{ inc.activo_nombre }}</span>
+                        <span class="cell-subtitle">{{ inc.activo_identificador or '—' }}</span>
+                    </td>
+                    <td class="cell-wrap">{{ inc.descripcion }}</td>
+                    <td>
+                        <span class="{% if inc.prioridad == 'Alta' or inc.prioridad == 'Crítica' %}prioridad-alta{% elif inc.prioridad == 'Media' %}prioridad-media{% else %}prioridad-baja{% endif %}">
+                            {{ inc.prioridad }}
+                        </span>
+                    </td>
+                    <td>{{ inc.estado }}</td>
+                    <td>{{ inc.solicitante_nombre or '—' }}</td>
+                    <td>{{ inc.responsable }}</td>
+                    <td class="cell-actions">
+                        <div class="table-actions">
+                            <a href="{{ url_for('detalle_incidencia', id=inc.id) }}" class="btn-primary btn-small">Ver</a>
+                            {% if puede(session.get('rol'), 'incidencias', 'editar') %}
+                                <a href="{{ url_for('editar_incidencia', id=inc.id) }}" class="btn-primary btn-small" style="background-color: var(--warning); color: #000;">Editar</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        No hay incidencias que coincidan con los filtros.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

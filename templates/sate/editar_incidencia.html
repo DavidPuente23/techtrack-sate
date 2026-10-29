@@ -1,0 +1,31 @@
+{% extends 'sate/base_sate.html' %}
+
+{% block title %}Editar Incidencia - SATE{% endblock %}
+
+{% block content %}
+<div class="card form-container">
+    <h2>Actualizar Incidencia #{{ incidencia.id }}</h2>
+
+    <form method="POST" action="{{ url_for('editar_incidencia', id=incidencia.id) }}">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+
+        <label for="estado">Estado del Reporte:</label>
+        <select id="estado" name="estado" required>
+            {% for estado in ['Nueva', 'Asignada', 'En proceso', 'Resuelta', 'Cerrada'] %}
+                <option value="{{ estado }}" {% if incidencia.estado == estado %}selected{% endif %}>{{ estado }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="diagnostico">Diagnóstico técnico:</label>
+        <textarea id="diagnostico" name="diagnostico" rows="3" placeholder="Causa probable o hallazgos de la revisión">{{ incidencia.diagnostico or '' }}</textarea>
+
+        <label for="resolucion">Resolución / Notas Técnicas:</label>
+        <textarea id="resolucion" name="resolucion" rows="4">{{ incidencia.resolucion or '' }}</textarea>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">Guardar y Sincronizar</button>
+            <a href="{{ url_for('incidencias') }}" class="btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

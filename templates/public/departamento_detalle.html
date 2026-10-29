@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ departamento.nombre }} | Departamentos de TechTrack Solutions{% endblock %}
+{% block description %}{{ departamento.nombre_largo }}: función, objetivo, políticas y perfil de puesto.{% endblock %}
+
+{% block content %}
+<nav class="breadcrumbs" aria-label="Ruta de navegación">
+    <a href="{{ url_for('inicio') }}">Inicio</a>
+    <span aria-hidden="true">/</span>
+    <a href="{{ url_for('departamentos') }}">Departamentos</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{{ departamento.nombre }}</span>
+</nav>
+
+<section class="page-hero page-hero--compact">
+    <p class="eyebrow">Departamento</p>
+    <h1>{{ departamento.nombre }}</h1>
+    <p class="page-lead">{{ departamento.nombre_largo }}</p>
+</section>
+
+<section class="section-block">
+    <div class="split-layout">
+        <div>
+            <h2 class="section-title">Función del área</h2>
+            <p>{{ departamento.funcion }}</p>
+
+            <h3 class="subheading">Objetivo</h3>
+            <p>{{ departamento.objetivo }}</p>
+
+            <h3 class="subheading">Funciones principales</h3>
+            <ul class="check-list">
+                {% for funcion in departamento.funciones %}
+                <li>{{ funcion }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <aside class="info-card">
+            <h3>En resumen</h3>
+            <dl class="definition-list">
+                <dt>Área</dt>
+                <dd>{{ departamento.nombre }}</dd>
+                <dt>Políticas que lidera</dt>
+                <dd>{{ responsables|length }}</dd>
+                <dt>Políticas en las que participa</dt>
+                <dd>{{ participa|length }}</dd>
+                <dt>Perfil de puesto</dt>
+                <dd>{{ perfil.nombre if perfil else 'No definido' }}</dd>
+            </dl>
+            {% if perfil %}
+            <a href="{{ url_for('detalle_perfil', slug=perfil.slug) }}" class="btn-primary">Ver perfil completo</a>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="section-heading-group">
+        <p class="eyebrow">Políticas</p>
+        <h2 class="section-title">Responsabilidad del área</h2>
+        <p class="section-subtitle">
+            El área lidera el cumplimiento de estas políticas y responde por su aplicación.
+        </p>
+    </div>
+
+    {% if responsables %}
+    <div class="grid-container">
+        {% for politica in responsables %}
+        <a class="card link-card policy-card" href="{{ url_for('detalle_politica', slug=politica.slug) }}">
+            <span class="policy-number">{{ "%02d"|format(politica.numero) }}</span>
+            <h3>{{ politica.nombre }}</h3>
+            <p>{{ politica.objetivo }}</p>
+            <span class="card-link">Ver política →</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-note">Esta área no tiene políticas asignadas como responsable principal.</p>
+    {% endif %}
+</section>
+
+<section class="section-block">
+    <div class="section-heading-group">
+        <p class="eyebrow">Colaboración</p>
+        <h2 class="section-title">Políticas en las que participa</h2>
+    </div>
+
+    {% if participa %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>N.º</th>
+                    <th>Política</th>
+                    <th>Área responsable</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for politica in participa %}
+                <tr>
+                    <td>{{ politica.numero }}</td>
+                    <td>{{ politica.nombre }}</td>
+                    <td>{{ departamentos[politica.responsable].nombre }}</td>
+                    <td><a href="{{ url_for('detalle_politica', slug=politica.slug) }}">Consultar</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-note">Esta área no participa en políticas adicionales.</p>
+    {% endif %}
+</section>
+
+{% if perfil %}
+<section class="section-block section-block--panel">
+    <div class="split-layout">
+        <div>
+            <p class="eyebrow">Perfil de puesto</p>
+            <h2 class="section-title">{{ perfil.nombre }}</h2>
+            <p>{{ perfil.objetivo }}</p>
+            <p class="card-meta"><strong>Reporta a:</strong> {{ perfil.reporta_a }} · <strong>Jornada:</strong> {{ perfil.jornada }}</p>
+            <a href="{{ url_for('detalle_perfil', slug=perfil.slug) }}" class="btn-primary">Ver perfil completo</a>
+        </div>
+        <div class="info-card">
+            <h3>Requisitos principales</h3>
+            <p>{{ perfil.requisitos_resumen }}</p>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="cta-band">
+    <div>
+        <h2>¿Quieres conocer al equipo detrás de SATE?</h2>
+        <p>Revisa los perfiles profesionales y las políticas de la empresa.</p>
+    </div>
+    <div class="cta-actions">
+        <a href="{{ url_for('trabaja_con_nosotros') }}" class="btn-primary">Ver perfiles</a>
+        <a href="{{ url_for('contacto') }}" class="btn-secondary">Contactar</a>
+    </div>
+</section>
+{% endblock %}

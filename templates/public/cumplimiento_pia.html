@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Cumplimiento del PIA | TechTrack Solutions{% endblock %}
+{% block description %}Trazabilidad entre los apartados del PIA y el sitio público y SATE: empresa, organigrama, políticas, perfiles y funcionalidades del producto.{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <p class="eyebrow">Trazabilidad del proyecto</p>
+    <h1>Cumplimiento del PIA</h1>
+    <p class="page-lead">
+        Esta página conecta cada apartado del Proyecto Integrador de Aprendizaje con el
+        lugar del sitio público o de SATE donde se demuestra. Sirve como evidencia de
+        que la estructura organizacional, las políticas, los perfiles y las metas del
+        producto están cubiertos.
+    </p>
+</section>
+
+<section class="metrics-strip" aria-label="Resumen del PIA">
+    <div class="metric">
+        <span class="metric-number">4</span>
+        <span class="metric-label">Departamentos</span>
+    </div>
+    <div class="metric">
+        <span class="metric-number">10</span>
+        <span class="metric-label">Políticas de gestión de TI</span>
+    </div>
+    <div class="metric">
+        <span class="metric-number">4</span>
+        <span class="metric-label">Perfiles de puesto</span>
+    </div>
+    <div class="metric">
+        <span class="metric-number">7</span>
+        <span class="metric-label">Roles en SATE</span>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading-group">
+        <p class="eyebrow">Matriz de evidencia</p>
+        <h2 class="section-title">Del documento a la aplicación</h2>
+        <p class="section-subtitle">
+            <strong>Publicado</strong> indica contenido del sitio; <strong>Implementado</strong>
+            indica una funcionalidad de SATE. Los enlaces a módulos privados piden iniciar
+            sesión.
+        </p>
+    </div>
+
+    <div class="table-container">
+        <table class="pia-table">
+            <thead>
+                <tr>
+                    <th>Apartado del PIA</th>
+                    <th>Qué pide</th>
+                    <th>Cómo se cumple</th>
+                    <th>Dónde verlo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in secciones %}
+                <tr>
+                    <td data-label="Apartado del PIA"><strong>{{ item.seccion }}</strong></td>
+                    <td data-label="Qué pide">{{ item.requisito }}</td>
+                    <td data-label="Cómo se cumple">{{ item.evidencia }}</td>
+                    <td class="pia-where" data-label="Dónde verlo">
+                        {% if item.endpoint %}
+                        <a href="{{ url_for(item.endpoint) }}">{{ item.donde }}</a>
+                        {% else %}
+                        {{ item.donde }}
+                        {% endif %}
+                        <span class="status-pill {% if item.estado == 'Implementado' %}status-pill--success{% else %}status-pill--info{% endif %}">
+                            {{ item.estado }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="section-heading-group">
+        <p class="eyebrow">Alcance</p>
+        <h2 class="section-title">Qué implementa esta versión y qué queda documentado</h2>
+    </div>
+
+    <div class="split-layout">
+        <div>
+            <h3 class="subheading">Implementado en SATE</h3>
+            <ul class="check-list">
+                <li>Registro de activos con identificador único, responsable, ubicación y estado.</li>
+                <li>Historial completo por activo y resguardo en PDF.</li>
+                <li>Mantenimientos con calendario, alertas de vencidos y próximos 7 días.</li>
+                <li>Incidencias con prioridad, diagnóstico, solución y cierre.</li>
+                <li>Reporte de inventario en PDF con filtros.</li>
+                <li>Usuarios y roles según la estructura del PIA.</li>
+            </ul>
+        </div>
+        <div>
+            <h3 class="subheading">Documentado como fase 2</h3>
+            <p class="detail-text detail-text--muted">
+                El PIA describe diez políticas de la empresa; no todas requieren un módulo
+                propio en la primera versión. Proveedores, cambios formales, problemas,
+                monitoreo de capacidad y continuidad se explican en las políticas y se
+                apoyan en el historial y las incidencias, pero quedan fuera del alcance
+                operativo de SATE en esta entrega.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="inline-actions">
+        <a href="{{ url_for('politicas') }}" class="btn-secondary">Ver las políticas</a>
+        <a href="{{ url_for('sate_info') }}" class="btn-primary">Conocer SATE</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}TechTrack Solutions | Gestión y trazabilidad de activos tecnológicos{% endblock %}
+{% block description %}TechTrack Solutions ayuda a las organizaciones a controlar sus activos tecnológicos con SATE: inventario, mantenimientos, incidencias e historial.{% endblock %}
+
+{% block content %}
+<section class="page-hero page-hero--home">
+    <p class="eyebrow">Tecnología para la gestión de activos</p>
+    <h1>Control total de tus activos tecnológicos</h1>
+    <p class="page-lead">
+        En TechTrack Solutions ayudamos a las organizaciones a saber qué equipos tienen,
+        quién los usa, en qué estado están y qué mantenimientos o fallas requieren atención.
+        Todo desde SATE, una plataforma web con historial y trazabilidad.
+    </p>
+    <div class="hero-actions">
+        <a href="{{ url_for('sate_info') }}" class="btn-primary">Conocer SATE</a>
+        <a href="{{ url_for('contacto') }}" class="btn-secondary">Contactar a la empresa</a>
+    </div>
+</section>
+
+<section class="metrics-strip" aria-label="Datos de TechTrack Solutions">
+    <div class="metric">
+        <span class="metric-number">{{ total_departamentos }}</span>
+        <span class="metric-label">Departamentos</span>
+    </div>
+    <div class="metric">
+        <span class="metric-number">{{ total_politicas }}</span>
+        <span class="metric-label">Políticas de gestión de TI</span>
+    </div>
+    <div class="metric">
+        <span class="metric-number">{{ total_perfiles }}</span>
+        <span class="metric-label">Perfiles profesionales</span>
+    </div>
+    <div class="metric">
+        <span class="metric-number">{{ sate.modulos|length }}</span>
+        <span class="metric-label">Módulos en SATE</span>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading-group">
+        <p class="eyebrow">El problema</p>
+        <h2 class="section-title">Cuando no hay trazabilidad, se pierde tiempo y dinero</h2>
+        <p class="section-subtitle">
+            La información de los equipos suele estar dispersa en hojas de cálculo, correos
+            y memoria del personal. Eso provoca compras duplicadas, mantenimientos vencidos
+            y fallas que se repiten sin solución.
+        </p>
+    </div>
+
+    <div class="grid-container">
+        <article class="card feature-card">
+            <span class="feature-icon" aria-hidden="true">01</span>
+            <h3>Inventario disperso</h3>
+            <p>No se sabe con certeza cuántos equipos hay, dónde están ni quién los tiene.</p>
+        </article>
+        <article class="card feature-card">
+            <span class="feature-icon" aria-hidden="true">02</span>
+            <h3>Mantenimientos vencidos</h3>
+            <p>Las fechas se pierden y los equipos fallan antes de recibir mantenimiento.</p>
+        </article>
+        <article class="card feature-card">
+            <span class="feature-icon" aria-hidden="true">03</span>
+            <h3>Incidencias sin seguimiento</h3>
+            <p>Los reportes se atienden por urgencia y no queda registro de la solución.</p>
+        </article>
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="split-layout">
+        <div>
+            <p class="eyebrow">El producto</p>
+            <h2 class="section-title">SATE centraliza el control de los equipos</h2>
+            <p>
+                SATE es el Sistema de Administración y Trazabilidad de Equipos de
+                TechTrack Solutions. Registra cada activo con un identificador único,
+                conserva su historial y permite programar mantenimientos y atender
+                incidencias con responsabilidad y seguimiento.
+            </p>
+            <p>
+                El objetivo es pasar de un control reactivo a uno preventivo: anticipar
+                fallas, justificar decisiones con datos y conservar la información aunque
+                cambien las personas.
+            </p>
+            <a href="{{ url_for('sate_info') }}" class="btn-primary">Ver funcionalidades</a>
+        </div>
+
+        <div class="feature-list">
+            {% for modulo in sate.modulos %}
+            <div class="feature-list-item">
+                <span class="feature-list-number">{{ loop.index }}</span>
+                <div>
+                    <h3>{{ modulo.nombre }}</h3>
+                    <p>{{ modulo.descripcion }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading-group">
+        <p class="eyebrow">Beneficios</p>
+        <h2 class="section-title">Qué gana una organización con SATE</h2>
+    </div>
+
+    <div class="grid-container">
+        {% for beneficio in sate.beneficios %}
+        <article class="card benefit-card">
+            <span class="check-mark" aria-hidden="true">✓</span>
+            <p>{{ beneficio }}</p>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block section-block--panel">
+    <div class="section-heading-group">
+        <p class="eyebrow">Conoce la empresa</p>
+        <h2 class="section-title">Una estructura alineada con el PIA</h2>
+        <p class="section-subtitle">
+            TechTrack Solutions organiza su operación en cuatro departamentos, diez políticas
+            de gestión de TI y un perfil de puesto por área.
+        </p>
+    </div>
+
+    <div class="grid-container">
+        <a class="card link-card" href="{{ url_for('departamentos') }}">
+            <h3>Departamentos</h3>
+            <p>Conoce las funciones de SIT, Redes, Desarrollo y Soporte.</p>
+            <span class="card-link">Ver departamentos →</span>
+        </a>
+        <a class="card link-card" href="{{ url_for('politicas') }}">
+            <h3>Políticas</h3>
+            <p>Consulta las diez políticas que rigen la gestión tecnológica.</p>
+            <span class="card-link">Ver políticas →</span>
+        </a>
+        <a class="card link-card" href="{{ url_for('trabaja_con_nosotros') }}">
+            <h3>Perfiles de puesto</h3>
+            <p>Revisa los perfiles profesionales de cada departamento.</p>
+            <span class="card-link">Ver perfiles →</span>
+        </a>
+        <a class="card link-card" href="{{ url_for('cumplimiento_pia') }}">
+            <h3>Cumplimiento del PIA</h3>
+            <p>Consulta cómo se cubre cada apartado del proyecto en el sitio y en SATE.</p>
+            <span class="card-link">Ver la matriz →</span>
+        </a>
+    </div>
+</section>
+
+<section class="cta-band">
+    <div>
+        <h2>¿Quieres conocer SATE en funcionamiento?</h2>
+        <p>Agenda una demostración o revisa las funcionalidades del sistema.</p>
+    </div>
+    <div class="cta-actions">
+        <a href="{{ url_for('contacto') }}" class="btn-primary">Solicitar información</a>
+        <a href="{{ url_for('login') }}" class="btn-secondary">Acceder a SATE</a>
+    </div>
+</section>
+{% endblock %}
