@@ -61,13 +61,23 @@ hace falta desplegar. Con la aplicación corriendo en `127.0.0.1:5000`:
 
 ### Cloudflare Tunnel (sin cuenta)
 
+La forma más simple es el script incluido, que arranca la aplicación si hace
+falta, descarga `cloudflared` y abre el túnel:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\publicar_tunel.ps1
+```
+
+También se puede hacer a mano:
+
 ```powershell
 winget install Cloudflare.cloudflared
 cloudflared tunnel --url http://127.0.0.1:5000
 ```
 
 Cloudflare muestra una URL `https://algo.trycloudflare.com` que funciona
-mientras la consola siga abierta y tu PC esté encendida.
+mientras la consola siga abierta y tu PC esté encendida. Esa URL cambia cada
+vez que se reinicia el túnel, así que hay que volver a compartirla.
 
 ### ngrok (requiere cuenta gratuita)
 
